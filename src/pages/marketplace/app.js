@@ -298,6 +298,8 @@ function openAddModal(){
   resetAddForm();
   setAddModalMode(false);
   document.getElementById('addModalBg').classList.add('open');
+  document.getElementById('addModalBg').scrollTop = 0;
+  lockPageScroll();
 }
 
 function openEditModal(id){
@@ -338,11 +340,14 @@ function openEditModal(id){
 
   closeModal();
   document.getElementById('addModalBg').classList.add('open');
+  document.getElementById('addModalBg').scrollTop = 0;
+  lockPageScroll();
 }
 
 function closeAddModal(){
   document.getElementById('addModalBg').classList.remove('open');
   afEditId = null;
+  unlockPageScroll();
 }
 
 function submitAddBrand(mode){
@@ -557,8 +562,39 @@ function scoreRow(label, val, max){
   '</div>';
 }
 
+/* Locks the page behind a modal so wheel/touch scrolling always stays inside the
+   modal instead of sometimes reaching the page underneath. Plain overflow:hidden
+   on body isn't reliable enough on its own (e.g. iOS Safari still rubber-bands the
+   page), so this also pins body in place at its current scroll offset and restores
+   it on unlock. */
+var pageScrollLockCount = 0;
+var pageScrollLockY = 0;
+function lockPageScroll(){
+  if(pageScrollLockCount === 0){
+    pageScrollLockY = window.scrollY;
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-pageScrollLockY) + 'px';
+    document.body.style.width = '100%';
+  }
+  pageScrollLockCount++;
+}
+function unlockPageScroll(){
+  pageScrollLockCount = Math.max(0, pageScrollLockCount - 1);
+  if(pageScrollLockCount === 0){
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, pageScrollLockY);
+  }
+}
+
 var currentModalId = null; /* which brand's detail modal is open, if any — lets realtime updates refresh it live */
 function openModal(id){
+  var isReopen = currentModalId !== id; /* switching brands (or opening from closed) vs. an in-place refresh */
   currentModalId = id;
   var b = getAllBrands().filter(function(x){ return x.id===id; })[0];
   if(!b){ closeModal(); return; } /* brand removed (e.g. by someone else) while this modal was open */
@@ -670,6 +706,8 @@ function openModal(id){
     '</div>';
 
   document.getElementById('modalBg').classList.add('open');
+  lockPageScroll();
+  if(isReopen){ document.getElementById('modalBg').scrollTop = 0; } /* a refresh-in-place keeps the viewer's scroll position */
 }
 
 function setStatus(id, status){
@@ -689,6 +727,7 @@ function setDeleteReason(id, reason){
 function closeModal(){
   currentModalId = null;
   document.getElementById('modalBg').classList.remove('open');
+  unlockPageScroll();
 }
 
 /* Re-renders the open detail modal in place when its brand changed elsewhere

@@ -225,6 +225,7 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
   position:fixed; inset:0; background:rgba(5,7,7,0.55);
   display:none; align-items:flex-start; justify-content:center;
   padding:40px 20px; overflow-y:auto; z-index:100;
+  overscroll-behavior:contain; /* stop scroll from chaining to the page behind once this reaches its top/bottom */
 }
 .modal-bg.open{display:flex;}
 .modal{
