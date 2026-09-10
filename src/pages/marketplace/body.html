@@ -1,0 +1,144 @@
+
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="wrap">
+    <div class="h-title">
+      <a class="logo brand" href="333-brand-site.html">333°</a>
+      <div class="sub mono">WELLNESS MARKETPLACE — BRAND RESEARCH DECK</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabDiscover" onclick="switchTab('discover')">DISCOVER</button>
+      <button class="tab-btn" id="tabSelected" onclick="switchTab('selected')">SELECTED</button>
+      <button class="tab-btn io-btn" onclick="exportData()">내보내기</button>
+      <button class="tab-btn io-btn" onclick="document.getElementById('importFileInput').click()">가져오기</button>
+      <input type="file" id="importFileInput" accept="application/json" style="display:none;" onchange="importData(event)">
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="filters-row">
+    <div class="filters" id="filterBar"></div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="viewGrid" onclick="setView('grid')" aria-label="Grid view">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="0.5" y="0.5" width="6" height="6" stroke="currentColor"/><rect x="8.5" y="0.5" width="6" height="6" stroke="currentColor"/><rect x="0.5" y="8.5" width="6" height="6" stroke="currentColor"/><rect x="8.5" y="8.5" width="6" height="6" stroke="currentColor"/></svg>
+      </button>
+      <button class="view-btn" id="viewList" onclick="setView('list')" aria-label="List view">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><line x1="0.5" y1="2" x2="14.5" y2="2" stroke="currentColor"/><line x1="0.5" y1="7.5" x2="14.5" y2="7.5" stroke="currentColor"/><line x1="0.5" y1="13" x2="14.5" y2="13" stroke="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="card-grid" id="cardGrid"></div>
+    <div class="empty-note" id="emptyNote" style="display:none;">아직 SAVE한 브랜드가 없어요.</div>
+    <button class="deleted-toggle" id="deletedToggle" style="display:none;" onclick="toggleShowDeleted()"></button>
+
+    <div class="stub-block" id="researchStub">
+      <button class="add-fab" onclick="openAddModal()">+ Add Brand</button>
+      <div class="api-note" style="margin-top:14px;">자동 웹 리서치는 API 연동이 필요해 아직 안 되지만, 정보를 알고 있는 브랜드는 직접 입력해서 바로 목록에 추가할 수 있어요.</div>
+    </div>
+
+    <div class="stub-block">
+      <h3>Discover Similar Brands</h3>
+      <div class="api-note">SAVE한 브랜드의 공통 특성과 DELETE 이유를 학습해 유사 브랜드를 추천하는 기능입니다. 실시간 브랜드 데이터베이스 / 검색 API 연동이 필요하며, 현재는 연결되어 있지 않습니다.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this) closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="modal-bg" id="addModalBg" onclick="if(event.target===this) closeAddModal()">
+  <div class="modal add-modal">
+    <button class="modal-close" onclick="closeAddModal()">×</button>
+    <div class="modal-body">
+      <div class="m-name" id="addModalTitle">브랜드 추가</div>
+
+      <div class="af-imgdrop" id="afImgDrop">
+        <div class="af-imgdrop-label" id="afImgDropLabel">이미지를 여기로 드래그<br><span>(선택 사항)</span></div>
+        <img class="af-imgdrop-preview" id="afImgPreview" style="display:none;">
+        <button class="img-remove-btn" id="afImgRemoveBtn" style="display:none;" onclick="event.stopPropagation(); clearAddFormImage();" title="이미지 삭제">×</button>
+      </div>
+
+      <div class="add-form">
+        <input type="text" id="afName" placeholder="브랜드명 *">
+        <input type="text" id="afCountry" placeholder="국가 (예: Japan / Tokyo)">
+        <div class="af-cats" id="afCats"></div>
+        <textarea id="afPhil" placeholder="한 줄 철학 / 소개" rows="2"></textarea>
+        <input type="text" id="afProducts" placeholder="대표 제품 (쉼표로 구분)">
+        <input type="text" id="afWebsite" placeholder="공식 웹사이트 URL">
+        <input type="text" id="afInstagram" placeholder="Instagram URL (선택)">
+
+        <div class="af-bs-label">Best Sellers (선택, 최대 3개)</div>
+        <div class="af-bs-row">
+          <input type="text" id="bsName0" placeholder="제품명">
+          <input type="number" id="bsAmount0" placeholder="금액" oninput="updateBsKrwPreview(0)">
+          <select id="bsCurrency0" onchange="updateBsKrwPreview(0)">
+            <option value="KRW">KRW</option>
+            <option value="USD">USD $</option>
+            <option value="JPY">JPY 엔</option>
+            <option value="EUR">EUR €</option>
+            <option value="GBP">GBP £</option>
+            <option value="AUD">AUD A$</option>
+          <option value="NZD">NZD NZ$</option>
+            <option value="TWD">TWD NT$</option>
+            <option value="THB">THB ฿</option>
+            <option value="CNY">CNY ¥</option>
+          </select>
+          <input type="text" id="bsUrl0" placeholder="상세페이지 URL">
+        </div>
+        <div class="af-bs-krw" id="bsKrwPreview0"></div>
+
+        <div class="af-bs-row">
+          <input type="text" id="bsName1" placeholder="제품명">
+          <input type="number" id="bsAmount1" placeholder="금액" oninput="updateBsKrwPreview(1)">
+          <select id="bsCurrency1" onchange="updateBsKrwPreview(1)">
+            <option value="KRW">KRW</option>
+            <option value="USD">USD $</option>
+            <option value="JPY">JPY 엔</option>
+            <option value="EUR">EUR €</option>
+            <option value="GBP">GBP £</option>
+            <option value="AUD">AUD A$</option>
+          <option value="NZD">NZD NZ$</option>
+            <option value="TWD">TWD NT$</option>
+            <option value="THB">THB ฿</option>
+            <option value="CNY">CNY ¥</option>
+          </select>
+          <input type="text" id="bsUrl1" placeholder="상세페이지 URL">
+        </div>
+        <div class="af-bs-krw" id="bsKrwPreview1"></div>
+
+        <div class="af-bs-row">
+          <input type="text" id="bsName2" placeholder="제품명">
+          <input type="number" id="bsAmount2" placeholder="금액" oninput="updateBsKrwPreview(2)">
+          <select id="bsCurrency2" onchange="updateBsKrwPreview(2)">
+            <option value="KRW">KRW</option>
+            <option value="USD">USD $</option>
+            <option value="JPY">JPY 엔</option>
+            <option value="EUR">EUR €</option>
+            <option value="GBP">GBP £</option>
+            <option value="AUD">AUD A$</option>
+          <option value="NZD">NZD NZ$</option>
+            <option value="TWD">TWD NT$</option>
+            <option value="THB">THB ฿</option>
+            <option value="CNY">CNY ¥</option>
+          </select>
+          <input type="text" id="bsUrl2" placeholder="상세페이지 URL">
+        </div>
+        <div class="af-bs-krw" id="bsKrwPreview2"></div>
+
+        <div class="af-error" id="afError"></div>
+      </div>
+
+      <div class="action-row" style="margin-top:20px;">
+        <button class="act-btn save" id="afBtnSave" onclick="submitAddBrand('saved')">저장</button>
+        <button class="act-btn" id="afBtnList" onclick="submitAddBrand('list')">리스트업</button>
+        <button class="act-btn delete" id="afBtnDiscard" onclick="submitAddBrand('discard')">삭제</button>
+      </div>
+    </div>
+  </div>
+</div>
+
