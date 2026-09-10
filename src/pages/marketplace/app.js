@@ -97,14 +97,6 @@ function idbDelete(key){
     return supa().from('brand_images').delete().eq('id', key).then(throwIfError);
   });
 }
-function idbGetAll(){
-  return supa().from('brand_images').select('*').then(function(res){
-    throwIfError(res);
-    var result = {};
-    res.data.forEach(function(row){ result[row.id] = imagePublicUrl(row.id, row.updated_at); });
-    return result;
-  });
-}
 var imageCache = {}; /* keys: 'hero:<id>' and 'bs:<id>:<idx>'; kept in sync via Supabase Realtime */
 
 function setHeroImage(id, dataUrl){
@@ -126,14 +118,12 @@ function setBsImage(id, idx, dataUrl){
 
 function getImgSrc(b, entry){
   if(entry.imageCleared) return null;
-  return imageCache['hero:'+b.id] || b.imgFile || null;
+  return imageCache['hero:'+b.id] || null;
 }
 
 function hasReliableImage(b, entry){
   if(entry.imageCleared) return false;
-  if(imageCache['hero:'+b.id]) return true;
-  if(b.imgFile && b.imgFile.indexOf('data:')===0) return true;
-  return false;
+  return !!imageCache['hero:'+b.id];
 }
 
 function clearImage(id){
@@ -164,6 +154,14 @@ function getAllBrands(){
   return brands;
 }
 
+/* Looks up a brand whether it's an accepted (DISCOVER) brand or an ADD BRAND
+   candidate — used by openModal so clicking either kind opens the same modal. */
+function findBrandById(id){
+  var found = brands.filter(function(b){ return b.id===id; })[0];
+  if(found) return found;
+  return candidateBrands.filter(function(b){ return b.id===id; })[0];
+}
+
 function removeCustomBrand(id){
   brands = brands.filter(function(b){ return b.id!==id; });
   saveBrands(brands);
@@ -171,6 +169,65 @@ function removeCustomBrand(id){
   saveStore(store);
   closeModal();
   render();
+}
+
+/* ---- ADD BRAND tab: candidates found by an external research agent ----
+   A candidate is just a 'brands' row with is_candidate = true (populated by
+   something other than this app, via the upsert_brand RPC). candidateBrands
+   holds those; 'brands' only ever holds is_candidate = false rows. Moving a
+   candidate to DISCOVER is just flipping that one column. */
+var candidateBrands = [];
+
+function renderCandidates(){
+  var grid = document.getElementById('candidateGrid');
+  var emptyEl = document.getElementById('candidatesEmptyNote');
+  grid.innerHTML = '';
+  if(candidateBrands.length === 0){
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  candidateBrands.forEach(function(b){
+    var footHtml =
+      '<div class="candidate-actions">' +
+        '<button class="candidate-move-btn" onclick="event.stopPropagation(); moveCandidateToDiscover(\'' + b.id + '\')">DISCOVER로 이동</button>' +
+        '<button class="candidate-delete-btn" onclick="event.stopPropagation(); deleteCandidate(\'' + b.id + '\')">삭제</button>' +
+      '</div>';
+    grid.appendChild(buildBrandCard(b, footHtml));
+  });
+}
+
+function moveCandidateToDiscover(id){
+  /* A candidate is just a brands row with is_candidate = true, so moving it
+     is one column flip on the same row — no cross-table copy, no id collision
+     possible against itself. */
+  var candidate = candidateBrands.find(function(c){ return c.id===id; });
+  if(!candidate) return;
+
+  candidateBrands = candidateBrands.filter(function(c){ return c.id!==id; });
+  brands.push(candidate);
+  syncedBrands[id] = JSON.stringify(candidate); /* already matches what's stored; just flipping is_candidate below */
+
+  supa().from('brands').update({is_candidate:false}).eq('id', id).then(function(res){
+    if(res.error){ console.error('failed to move candidate to discover', res.error); alert('이동에 실패했어요 (인터넷 연결을 확인해주세요).'); }
+  });
+
+  render();
+  showToast(candidate.name + '을(를) DISCOVER로 옮겼어요');
+}
+
+function deleteCandidate(id){
+  var candidate = candidateBrands.find(function(c){ return c.id===id; });
+  if(!candidate) return;
+  if(!confirm(candidate.name + ' 후보를 목록에서 삭제할까요?')) return;
+
+  candidateBrands = candidateBrands.filter(function(c){ return c.id!==id; });
+  supa().from('brands').delete().eq('id', id).then(function(res){
+    if(res.error){ console.error('failed to delete candidate', res.error); alert('삭제에 실패했어요 (인터넷 연결을 확인해주세요).'); }
+  });
+
+  render();
+  showToast(candidate.name + ' 후보를 삭제했어요');
 }
 
 function showToast(msg){
@@ -438,7 +495,6 @@ function submitAddBrand(mode){
     whyFits: null,
     potential: [],
     imageLabel: name.toUpperCase(),
-    imgFile: 'images/' + id + '.jpg',
     sourceNote: '직접 입력한 브랜드',
     custom: true
   };
@@ -474,7 +530,10 @@ function switchTab(tab){
   state.tab = tab;
   document.getElementById('tabDiscover').classList.toggle('active', tab==='discover');
   document.getElementById('tabSelected').classList.toggle('active', tab==='selected');
-  document.getElementById('researchStub').style.display = tab==='discover' ? 'block' : 'none';
+  document.getElementById('tabAdd').classList.toggle('active', tab==='candidates');
+  document.getElementById('discoverFiltersRow').style.display = tab==='candidates' ? 'none' : 'flex';
+  document.getElementById('discoverDeck').style.display = tab==='candidates' ? 'none' : 'block';
+  document.getElementById('candidatesDeck').style.display = tab==='candidates' ? 'block' : 'none';
   render();
 }
 
@@ -486,6 +545,10 @@ function statusLabel(st){
 }
 
 function render(){
+  if(state.tab === 'candidates'){
+    renderCandidates();
+    return;
+  }
   renderFilters();
   var grid = document.getElementById('cardGrid');
   grid.classList.toggle('list-view', state.view==='list');
@@ -524,33 +587,40 @@ function render(){
 
   list.forEach(function(b){
     var entry = getEntry(b.id);
-    var card = document.createElement('div');
-    card.className = 'b-card';
-    card.onclick = function(){ openModal(b.id); };
     var statusHtml = entry.status ? '<div class="b-status ' + entry.status + '">' + statusLabel(entry.status) + '</div>' : '<div></div>';
-    var imgSrc = getImgSrc(b, entry);
-    var removeBtnHtml = imgSrc ? '<button class="img-remove-btn" onclick="event.stopPropagation(); clearImage(\'' + b.id + '\')" title="이미지 삭제">×</button>' : '';
-    card.innerHTML =
-      '<div class="b-hero" data-brand-id="' + b.id + '">' +
-        '<div class="hero-fallback">' +
-          '<div class="mono-tag mono">' + b.country + '</div>' +
-          '<div><div class="initial brand">' + b.name.charAt(0) + '</div></div>' +
-        '</div>' +
-        (imgSrc ? '<img class="hero-img" src="' + imgSrc + '" alt="' + b.name + '" onload="this.classList.add(\'loaded\')" onerror="this.remove()">' : '') +
-        removeBtnHtml +
-        '<div class="drop-hint">이미지를 드래그해서 ' + (imgSrc ? '변경' : '추가') + '하세요</div>' +
-      '</div>' +
-      '<div class="b-meta">' +
-        '<div class="b-name">' + b.name + '</div>' +
-        '<div class="b-cat mono">' + b.country + ' · ' + b.category.join(' · ') + '</div>' +
-        '<div class="b-phil">' + b.philosophy + '</div>' +
-        (b.bestSellers && b.bestSellers.length ? '<div class="b-best">Best: ' + b.bestSellers[0].name + '</div>' : '') +
-        '<div class="b-foot">' +
-          statusHtml +
-        '</div>' +
-      '</div>';
-    grid.appendChild(card);
+    grid.appendChild(buildBrandCard(b, statusHtml));
   });
+}
+
+/* Shared by the DISCOVER/SELECTED grid and the ADD BRAND candidates grid, so
+   both show items with the exact same card layout, image, and click-to-open-
+   modal behavior — only the .b-foot content differs (status badge vs. the
+   candidate move/delete buttons). */
+function buildBrandCard(b, footHtml){
+  var entry = getEntry(b.id);
+  var card = document.createElement('div');
+  card.className = 'b-card';
+  card.onclick = function(){ openModal(b.id); };
+  var imgSrc = getImgSrc(b, entry);
+  var removeBtnHtml = imgSrc ? '<button class="img-remove-btn" onclick="event.stopPropagation(); clearImage(\'' + b.id + '\')" title="이미지 삭제">×</button>' : '';
+  card.innerHTML =
+    '<div class="b-hero" data-brand-id="' + b.id + '">' +
+      '<div class="hero-fallback">' +
+        '<div class="mono-tag mono">' + b.country + '</div>' +
+        '<div><div class="initial brand">' + b.name.charAt(0) + '</div></div>' +
+      '</div>' +
+      (imgSrc ? '<img class="hero-img" src="' + imgSrc + '" alt="' + b.name + '" onload="this.classList.add(\'loaded\')" onerror="this.remove()">' : '') +
+      removeBtnHtml +
+      '<div class="drop-hint">이미지를 드래그해서 ' + (imgSrc ? '변경' : '추가') + '하세요</div>' +
+    '</div>' +
+    '<div class="b-meta">' +
+      '<div class="b-name">' + b.name + '</div>' +
+      '<div class="b-cat mono">' + b.country + ' · ' + b.category.join(' · ') + '</div>' +
+      '<div class="b-phil">' + b.philosophy + '</div>' +
+      (b.bestSellers && b.bestSellers.length ? '<div class="b-best">Best: ' + b.bestSellers[0].name + '</div>' : '') +
+      '<div class="b-foot">' + footHtml + '</div>' +
+    '</div>';
+  return card;
 }
 
 function scoreRow(label, val, max){
@@ -596,7 +666,7 @@ var currentModalId = null; /* which brand's detail modal is open, if any — let
 function openModal(id){
   var isReopen = currentModalId !== id; /* switching brands (or opening from closed) vs. an in-place refresh */
   currentModalId = id;
-  var b = getAllBrands().filter(function(x){ return x.id===id; })[0];
+  var b = findBrandById(id); /* discover/selected brand, or an ADD BRAND candidate — same modal either way */
   if(!b){ closeModal(); return; } /* brand removed (e.g. by someone else) while this modal was open */
   var entry = getEntry(id);
   var m = document.getElementById('modalContent');
@@ -894,106 +964,6 @@ function clearAddFormImage(){
   document.getElementById('afImgRemoveBtn').style.display = 'none';
 }
 
-function exportData(){
-  idbGetAll().then(function(images){
-    var bundle = {
-      version: 3,
-      exportedAt: new Date().toISOString(),
-      store: store,
-      brands: brands,
-      images: images
-    };
-    var blob = new Blob([JSON.stringify(bundle, null, 2)], {type: 'application/json'});
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = '333-marketplace-data.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }).catch(function(){
-    alert('이미지 데이터를 불러오지 못해 내보내기에 실패했어요.');
-  });
-}
-
-function importData(event){
-  var file = event.target.files[0];
-  if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var bundle;
-    try{
-      bundle = JSON.parse(e.target.result);
-    }catch(err){
-      alert('파일을 읽지 못했어요. 올바른 내보내기 파일인지 확인해주세요.');
-      return;
-    }
-    if(bundle.store){
-      Object.keys(bundle.store).forEach(function(id){
-        var incoming = bundle.store[id];
-        var local = store[id];
-        if(!local){
-          store[id] = incoming;
-          return;
-        }
-        /* keep local judgment (status/deleteReason) if already set, else take incoming */
-        if(!local.status && incoming.status) local.status = incoming.status;
-        if(!local.deleteReason && incoming.deleteReason) local.deleteReason = incoming.deleteReason;
-        /* merge comments: combine both lists, dedupe by author+text+ts */
-        var localComments = local.comments || [];
-        var incomingComments = incoming.comments || [];
-        var seen = {};
-        localComments.forEach(function(c){ seen[c.author+'|'+c.text+'|'+c.ts] = true; });
-        incomingComments.forEach(function(c){
-          var key = c.author+'|'+c.text+'|'+c.ts;
-          if(!seen[key]){ localComments.push(c); seen[key] = true; }
-        });
-        local.comments = localComments;
-      });
-      saveStore(store);
-    }
-    if(bundle.brands){
-      /* current export format: one flat brands array, already fully merged */
-      var existingIds = brands.map(function(b){ return b.id; });
-      bundle.brands.forEach(function(b){
-        if(existingIds.indexOf(b.id)===-1) brands.push(b);
-      });
-      saveBrands(brands);
-    }else if(bundle.customBrands || bundle.overrides){
-      /* backward-compat: pre-unification export format (separate customBrands + overrides) */
-      if(bundle.customBrands){
-        var existingIds2 = brands.map(function(b){ return b.id; });
-        bundle.customBrands.forEach(function(b){
-          if(existingIds2.indexOf(b.id)===-1) brands.push(b);
-        });
-      }
-      if(bundle.overrides){
-        Object.keys(bundle.overrides).forEach(function(id){
-          var idx = -1;
-          brands.forEach(function(b, i){ if(b.id===id) idx = i; });
-          if(idx!==-1) brands[idx] = Object.assign({}, brands[idx], bundle.overrides[id]);
-        });
-      }
-      saveBrands(brands);
-    }
-    var imgKeys = bundle.images ? Object.keys(bundle.images) : [];
-    Promise.all(imgKeys.map(function(k){
-      imageCache[k] = bundle.images[k];
-      return idbSet(k, bundle.images[k]);
-    })).then(function(){
-      event.target.value = '';
-      render();
-      alert('가져오기 완료! 이미지와 저장 상태가 복원됐어요.');
-    }).catch(function(){
-      event.target.value = '';
-      render();
-      alert('가져오기는 됐지만 일부 이미지 저장에 실패했어요.');
-    });
-  };
-  reader.readAsText(file);
-}
-
 renderAddFormCats();
 
 /* ---- Supabase sync (replaces Firestore) ----
@@ -1054,21 +1024,26 @@ function syncBrandEntries(s){
   });
 }
 
+/* brands is stored relationally (real columns + brand_categories/products/
+   best_sellers/potential child tables, see brands_view). The client still
+   works with one nested brand object per the rest of this file — saving one
+   just calls the upsert_brand RPC, which fans it out across those tables in a
+   single transaction, so nothing else in this file has to know the storage
+   isn't one big blob. */
 function syncBrands(list){
   var prevIds = Object.keys(syncedBrands);
   var nextIds = list.map(function(b){ return b.id; });
-  var upserts = [];
+  var changed = [];
   list.forEach(function(b){
     var json = JSON.stringify(b);
-    if(syncedBrands[b.id] !== json){ upserts.push({id:b.id, data:b}); }
+    if(syncedBrands[b.id] !== json){ changed.push(b); }
   });
   var removedIds = prevIds.filter(function(id){ return nextIds.indexOf(id)===-1; });
-  var ops = [];
-  if(upserts.length) ops.push(supa().from('brands').upsert(upserts));
+  var ops = changed.map(function(b){ return supa().rpc('upsert_brand', {brand:b}); });
   removedIds.forEach(function(id){ ops.push(supa().from('brands').delete().eq('id', id)); });
   Promise.all(ops).then(function(results){
     if(results.some(function(r){ return r.error; })) throw new Error('save failed');
-    upserts.forEach(function(row){ syncedBrands[row.id] = JSON.stringify(row.data); });
+    changed.forEach(function(b){ syncedBrands[b.id] = JSON.stringify(b); });
     removedIds.forEach(function(id){ delete syncedBrands[id]; });
   }).catch(function(){
     alert('저장에 실패했어요 (인터넷 연결을 확인해주세요).');
@@ -1100,7 +1075,7 @@ function initSupabaseSync(){
   function loadAll(){
     return Promise.all([
       sb.from('brand_entries').select('*'),
-      sb.from('brands').select('*'),
+      sb.from('brands_view').select('*'),
       sb.from('brand_images').select('*')
     ]).then(function(results){
       if(!isCurrentSyncGen()) return;
@@ -1115,10 +1090,11 @@ function initSupabaseSync(){
       });
 
       brands = [];
+      candidateBrands = [];
       syncedBrands = {};
       brandsRes.data.forEach(function(row){
-        brands.push(row.data);
-        syncedBrands[row.id] = JSON.stringify(row.data);
+        if(row.is_candidate){ candidateBrands.push(row.data); }
+        else{ brands.push(row.data); syncedBrands[row.id] = JSON.stringify(row.data); }
       });
 
       imageCache = {};
@@ -1126,6 +1102,30 @@ function initSupabaseSync(){
 
       render();
     }).catch(function(err){ console.error('initial load error', err); });
+  }
+
+  /* Re-fetches one brand's fully-assembled row from brands_view and places it
+     in the right local list (brands vs candidateBrands) based on is_candidate.
+     Used by every brand-related realtime handler below — brand data now spans
+     5 tables, so a change on any of them means "go re-read this one brand",
+     rather than being able to apply the change from the payload alone. */
+  function refetchBrand(id){
+    if(!id) return;
+    sb.from('brands_view').select('*').eq('id', id).then(function(res){
+      if(!isCurrentSyncGen()) return;
+      if(res.error){ console.error('refetch brand failed', res.error); return; }
+      brands = brands.filter(function(b){ return b.id !== id; });
+      candidateBrands = candidateBrands.filter(function(b){ return b.id !== id; });
+      var row = res.data && res.data[0];
+      if(row){
+        if(row.is_candidate){ candidateBrands.push(row.data); }
+        else{ brands.push(row.data); syncedBrands[id] = JSON.stringify(row.data); }
+      }else{
+        delete syncedBrands[id];
+      }
+      render();
+      refreshModalIfOpen(id);
+    });
   }
 
   loadAll();
@@ -1147,18 +1147,23 @@ function initSupabaseSync(){
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'brands'}, function(payload){
       if(!isCurrentSyncGen()) return;
-      var id = payload.eventType === 'DELETE' ? payload.old.id : payload.new.id;
-      if(payload.eventType === 'DELETE'){
-        brands = brands.filter(function(b){ return b.id !== id; });
-        delete syncedBrands[id];
-      }else{
-        var idx = -1;
-        brands.forEach(function(b, i){ if(b.id === payload.new.id) idx = i; });
-        if(idx===-1) brands.push(payload.new.data); else brands[idx] = payload.new.data;
-        syncedBrands[payload.new.id] = JSON.stringify(payload.new.data);
-      }
-      render();
-      refreshModalIfOpen(id);
+      refetchBrand(payload.eventType === 'DELETE' ? payload.old.id : payload.new.id);
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'brand_categories'}, function(payload){
+      if(!isCurrentSyncGen()) return;
+      refetchBrand(payload.eventType === 'DELETE' ? payload.old.brand_id : payload.new.brand_id);
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'brand_products'}, function(payload){
+      if(!isCurrentSyncGen()) return;
+      refetchBrand(payload.eventType === 'DELETE' ? payload.old.brand_id : payload.new.brand_id);
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'brand_best_sellers'}, function(payload){
+      if(!isCurrentSyncGen()) return;
+      refetchBrand(payload.eventType === 'DELETE' ? payload.old.brand_id : payload.new.brand_id);
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'brand_potential'}, function(payload){
+      if(!isCurrentSyncGen()) return;
+      refetchBrand(payload.eventType === 'DELETE' ? payload.old.brand_id : payload.new.brand_id);
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'brand_images'}, function(payload){
       if(!isCurrentSyncGen()) return;

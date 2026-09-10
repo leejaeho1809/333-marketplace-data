@@ -50,8 +50,6 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
   padding:9px 18px; cursor:pointer;
 }
 .tab-btn.active{border-color:var(--ink); color:var(--ink); font-weight:600;}
-.io-btn{color:var(--blue); border-color:var(--blue); margin-left:8px;}
-.io-btn:hover{background:var(--blue); color:#fff;}
 
 /* filter chips */
 .filters-row{
@@ -193,9 +191,32 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
 .add-fab{
   background:var(--ink); border:1px solid var(--ink); color:var(--bg);
   font-family:'IBM Plex Sans KR',sans-serif; font-size:13px; font-weight:500;
-  padding:12px 24px; cursor:pointer;
+  padding:12px 24px; cursor:pointer; flex-shrink:0;
 }
 .add-fab:hover{opacity:0.85;}
+
+/* ADD BRAND tab: agent-discovered candidates awaiting review.
+   Cards reuse .b-card/.b-hero/.b-meta etc. (same layout as DISCOVER) — only
+   .b-foot's content differs: move/delete buttons instead of a status badge. */
+.candidates-header{
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+  flex-wrap:wrap; margin-bottom:28px;
+}
+.candidates-header .api-note{margin:0; max-width:640px;}
+.candidate-actions{display:flex; gap:8px; width:100%;}
+.candidate-move-btn{
+  flex:1;
+  background:none; border:1px solid var(--blue); color:var(--blue);
+  font-family:'IBM Plex Sans KR',sans-serif; font-size:11.5px; font-weight:500;
+  padding:8px 10px; cursor:pointer;
+}
+.candidate-move-btn:hover{background:var(--blue); color:#fff;}
+.candidate-delete-btn{
+  background:none; border:1px solid var(--line); color:var(--stone);
+  font-family:'IBM Plex Sans KR',sans-serif; font-size:11.5px; font-weight:500;
+  padding:8px 10px; cursor:pointer;
+}
+.candidate-delete-btn:hover{border-color:#B5645A; color:#B5645A;}
 .add-modal{max-width:520px;}
 .af-imgdrop{
   position:relative; margin-top:20px;

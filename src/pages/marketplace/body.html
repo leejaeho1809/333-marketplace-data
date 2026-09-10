@@ -10,15 +10,13 @@
     <div class="tabs">
       <button class="tab-btn active" id="tabDiscover" onclick="switchTab('discover')">DISCOVER</button>
       <button class="tab-btn" id="tabSelected" onclick="switchTab('selected')">SELECTED</button>
-      <button class="tab-btn io-btn" onclick="exportData()">내보내기</button>
-      <button class="tab-btn io-btn" onclick="document.getElementById('importFileInput').click()">가져오기</button>
-      <input type="file" id="importFileInput" accept="application/json" style="display:none;" onchange="importData(event)">
+      <button class="tab-btn" id="tabAdd" onclick="switchTab('candidates')">ADD BRAND</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="filters-row">
+  <div class="filters-row" id="discoverFiltersRow">
     <div class="filters" id="filterBar"></div>
     <div class="view-toggle">
       <button class="view-btn active" id="viewGrid" onclick="setView('grid')" aria-label="Grid view">
@@ -30,20 +28,24 @@
     </div>
   </div>
 
-  <div class="deck">
+  <div class="deck" id="discoverDeck">
     <div class="card-grid" id="cardGrid"></div>
     <div class="empty-note" id="emptyNote" style="display:none;">아직 SAVE한 브랜드가 없어요.</div>
     <button class="deleted-toggle" id="deletedToggle" style="display:none;" onclick="toggleShowDeleted()"></button>
-
-    <div class="stub-block" id="researchStub">
-      <button class="add-fab" onclick="openAddModal()">+ Add Brand</button>
-      <div class="api-note" style="margin-top:14px;">자동 웹 리서치는 API 연동이 필요해 아직 안 되지만, 정보를 알고 있는 브랜드는 직접 입력해서 바로 목록에 추가할 수 있어요.</div>
-    </div>
 
     <div class="stub-block">
       <h3>Discover Similar Brands</h3>
       <div class="api-note">SAVE한 브랜드의 공통 특성과 DELETE 이유를 학습해 유사 브랜드를 추천하는 기능입니다. 실시간 브랜드 데이터베이스 / 검색 API 연동이 필요하며, 현재는 연결되어 있지 않습니다.</div>
     </div>
+  </div>
+
+  <div class="deck" id="candidatesDeck" style="display:none;">
+    <div class="candidates-header">
+      <div class="api-note">다른 에이전트가 웹 리서치로 찾아낸 브랜드 후보 목록이에요. 마음에 들면 DISCOVER로 옮기고, 직접 아는 브랜드는 바로 추가하세요.</div>
+      <button class="add-fab" onclick="openAddModal()">+ Add Brand</button>
+    </div>
+    <div class="card-grid" id="candidateGrid"></div>
+    <div class="empty-note" id="candidatesEmptyNote" style="display:none;">아직 등록된 후보 브랜드가 없어요.</div>
   </div>
 </div>
 
