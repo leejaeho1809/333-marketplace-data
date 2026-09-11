@@ -320,7 +320,10 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
 .comment-item{border-top:1px solid var(--line); padding-top:10px;}
 .comment-head{display:flex; justify-content:space-between; align-items:baseline;}
 .comment-author{font-size:12.5px; font-weight:600; color:var(--ink);}
+.comment-meta{display:flex; align-items:baseline; gap:8px;}
 .comment-date{font-size:11px; color:var(--stone-light);}
+.comment-delete-btn{background:none; border:none; color:var(--stone-light); font-size:14px; line-height:1; cursor:pointer; padding:2px 4px; margin:-2px -4px;}
+.comment-delete-btn:hover{color:#B5645A;}
 .comment-text{margin-top:5px; font-size:13.5px; color:var(--ink); line-height:1.6; white-space:pre-wrap;}
 .comment-form{margin-top:16px; padding-top:16px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px;}
 .comment-form input, .comment-form textarea{

@@ -39,7 +39,7 @@ function saveUsername(name){
   try{ localStorage.setItem(USERNAME_KEY, name); }catch(e){}
 }
 
-function renderComments(entry){
+function renderComments(entry, brandId){
   if(!entry.comments || !entry.comments.length){
     return '<div class="comment-empty">아직 댓글이 없어요.</div>';
   }
@@ -47,10 +47,23 @@ function renderComments(entry){
     var d = new Date(c.ts);
     var dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
     return '<div class="comment-item">' +
-      '<div class="comment-head"><span class="comment-author">' + c.author + '</span><span class="comment-date">' + dateStr + '</span></div>' +
+      '<div class="comment-head">' +
+        '<span class="comment-author">' + c.author + '</span>' +
+        '<span class="comment-meta">' +
+          '<span class="comment-date">' + dateStr + '</span>' +
+          '<button class="comment-delete-btn" onclick="deleteComment(\'' + brandId + '\',' + c.ts + ')" title="댓글 삭제">×</button>' +
+        '</span>' +
+      '</div>' +
       '<div class="comment-text">' + c.text.replace(/</g,'&lt;') + '</div>' +
     '</div>';
   }).join('');
+}
+
+function deleteComment(id, ts){
+  var entry = getEntry(id);
+  entry.comments = (entry.comments || []).filter(function(c){ return c.ts !== ts; });
+  saveStore(store);
+  openModal(id);
 }
 
 function addComment(id){
@@ -754,7 +767,7 @@ function openModal(id){
 
       '<div class="m-section">' +
         '<div class="m-label">Comments</div>' +
-        '<div class="comment-list" id="commentList">' + renderComments(entry) + '</div>' +
+        '<div class="comment-list" id="commentList">' + renderComments(entry, id) + '</div>' +
         '<div class="comment-form">' +
           '<input type="text" id="commentAuthor" placeholder="이름" value="' + (loadUsername()||'').replace(/"/g,'&quot;') + '">' +
           '<textarea id="commentText" placeholder="댓글을 남겨보세요"></textarea>' +
