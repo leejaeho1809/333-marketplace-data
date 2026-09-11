@@ -60,6 +60,7 @@ function renderComments(entry, brandId){
 }
 
 function deleteComment(id, ts){
+  if(!confirm('이 댓글을 삭제할까요?')) return;
   var entry = getEntry(id);
   entry.comments = (entry.comments || []).filter(function(c){ return c.ts !== ts; });
   saveStore(store);
@@ -649,30 +650,36 @@ function scoreRow(label, val, max){
    modal instead of sometimes reaching the page underneath. Plain overflow:hidden
    on body isn't reliable enough on its own (e.g. iOS Safari still rubber-bands the
    page), so this also pins body in place at its current scroll offset and restores
-   it on unlock. */
-var pageScrollLockCount = 0;
+   it on unlock.
+
+   This is a simple on/off flag, not a counter: openModal() re-runs (and calls
+   lockPageScroll() again) every time the modal content refreshes in place —
+   e.g. clicking SAVE calls setStatus(), which calls openModal() again on the
+   same still-open modal — while closeModal() only ever runs once per actual
+   close. A counter would need exactly one unlock per lock and never gets
+   there, leaving the page stuck unscrollable after close; a flag just asks
+   "is a modal open right now", which matches how this file actually calls it. */
+var pageScrollLocked = false;
 var pageScrollLockY = 0;
 function lockPageScroll(){
-  if(pageScrollLockCount === 0){
-    pageScrollLockY = window.scrollY;
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = (-pageScrollLockY) + 'px';
-    document.body.style.width = '100%';
-  }
-  pageScrollLockCount++;
+  if(pageScrollLocked) return;
+  pageScrollLocked = true;
+  pageScrollLockY = window.scrollY;
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.top = (-pageScrollLockY) + 'px';
+  document.body.style.width = '100%';
 }
 function unlockPageScroll(){
-  pageScrollLockCount = Math.max(0, pageScrollLockCount - 1);
-  if(pageScrollLockCount === 0){
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    window.scrollTo(0, pageScrollLockY);
-  }
+  if(!pageScrollLocked) return;
+  pageScrollLocked = false;
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, pageScrollLockY);
 }
 
 var currentModalId = null; /* which brand's detail modal is open, if any — lets realtime updates refresh it live */
