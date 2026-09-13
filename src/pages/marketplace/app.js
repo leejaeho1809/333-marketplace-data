@@ -196,12 +196,16 @@ function renderCandidates(){
   var grid = document.getElementById('candidateGrid');
   var emptyEl = document.getElementById('candidatesEmptyNote');
   grid.innerHTML = '';
-  if(candidateBrands.length === 0){
+  /* Soft-deleted candidates (getEntry(id).status==='deleted') stay in the
+     brands table — deleteCandidate() no longer hard-deletes the row — so
+     they must be filtered out here to actually disappear from the tab. */
+  var visibleCandidates = candidateBrands.filter(function(b){ return getEntry(b.id).status !== 'deleted'; });
+  if(visibleCandidates.length === 0){
     emptyEl.style.display = 'block';
     return;
   }
   emptyEl.style.display = 'none';
-  candidateBrands.forEach(function(b){
+  visibleCandidates.forEach(function(b){
     var footHtml =
       '<div class="candidate-actions">' +
         '<button class="candidate-move-btn" onclick="event.stopPropagation(); moveCandidateToDiscover(\'' + b.id + '\')">DISCOVER로 이동</button>' +
@@ -235,10 +239,14 @@ function deleteCandidate(id){
   if(!candidate) return;
   if(!confirm(candidate.name + ' 후보를 목록에서 삭제할까요?')) return;
 
-  candidateBrands = candidateBrands.filter(function(c){ return c.id!==id; });
-  supa().from('brands').delete().eq('id', id).then(function(res){
-    if(res.error){ console.error('failed to delete candidate', res.error); alert('삭제에 실패했어요 (인터넷 연결을 확인해주세요).'); }
-  });
+  /* Soft delete only — mark it via brand_entries.status like the DISCOVER
+     tab's DELETE button (setStatus) does, instead of removing the brands
+     row. The data (and its images) stays recoverable in Supabase; it just
+     stops rendering in this tab (see the getEntry(...).status!=='deleted'
+     filter in renderCandidates). */
+  var e = getEntry(id);
+  e.status = 'deleted';
+  saveStore(store);
 
   render();
   showToast(candidate.name + ' 후보를 삭제했어요');
