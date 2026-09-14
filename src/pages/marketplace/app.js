@@ -382,7 +382,11 @@ function openAddModal(){
 }
 
 function openEditModal(id){
-  var b = getAllBrands().filter(function(x){ return x.id===id; })[0];
+  /* findBrandById (not getAllBrands) — this button also appears on ADD BRAND
+     candidates, which live in candidateBrands, not brands. getAllBrands()
+     only covers the DISCOVER list, so using it here silently no-op'd the
+     button for every candidate. */
+  var b = findBrandById(id);
   if(!b) return;
   resetAddForm();
   afEditId = id;
@@ -448,7 +452,7 @@ function submitAddBrand(mode){
   var instagram = document.getElementById('afInstagram').value.trim();
   var productsArr = productsRaw ? productsRaw.split(',').map(function(p){ return p.trim(); }).filter(Boolean) : [];
 
-  var existingBs = afEditId ? (getAllBrands().filter(function(x){ return x.id===afEditId; })[0] || {}).bestSellers || [] : [];
+  var existingBs = afEditId ? (findBrandById(afEditId) || {}).bestSellers || [] : [];
 
   var bestSellersArr = [];
   for(var i=0;i<3;i++){
@@ -476,7 +480,7 @@ function submitAddBrand(mode){
   }
 
   if(afEditId){
-    var existingBrand = getAllBrands().filter(function(x){ return x.id===afEditId; })[0] || {};
+    var existingBrand = findBrandById(afEditId) || {};
     var updatedBrand = Object.assign({}, existingBrand, {
       id: afEditId,
       name: name,
@@ -488,10 +492,26 @@ function submitAddBrand(mode){
       instagram: instagram || null,
       bestSellers: bestSellersArr
     });
-    var editIdx = -1;
-    brands.forEach(function(b, i){ if(b.id===afEditId) editIdx = i; });
-    if(editIdx===-1) brands.push(updatedBrand); else brands[editIdx] = updatedBrand;
-    saveBrands(brands);
+
+    /* This button also edits ADD BRAND candidates, which live in
+       candidateBrands (is_candidate=true), not brands. Route the update to
+       whichever list actually holds this id, and for a candidate, write it
+       with the same upsert_brand RPC moveCandidateToDiscover uses — going
+       through saveBrands()/syncBrands() here would push it into the brands
+       array/table and implicitly (mis)move it to DISCOVER. */
+    var candIdx = -1;
+    candidateBrands.forEach(function(b, i){ if(b.id===afEditId) candIdx = i; });
+    if(candIdx !== -1){
+      candidateBrands[candIdx] = updatedBrand;
+      supa().rpc('upsert_brand', {brand: updatedBrand}).then(function(res){
+        if(res.error){ console.error('failed to save candidate edit', res.error); alert('저장에 실패했어요 (인터넷 연결을 확인해주세요).'); }
+      });
+    } else {
+      var editIdx = -1;
+      brands.forEach(function(b, i){ if(b.id===afEditId) editIdx = i; });
+      if(editIdx===-1) brands.push(updatedBrand); else brands[editIdx] = updatedBrand;
+      saveBrands(brands);
+    }
 
     if(afCustomImage){ setHeroImage(afEditId, afCustomImage); }
 
