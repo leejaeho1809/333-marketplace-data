@@ -563,12 +563,13 @@ function renderFilters(){
     var btn = document.createElement('button');
     btn.className = 'chip' + (state.filter===c ? ' active' : '');
     btn.textContent = c;
-    btn.onclick = function(){ state.filter = c; render(); };
+    btn.onclick = function(){ vibrate(15); state.filter = c; render(); };
     bar.appendChild(btn);
   });
 }
 
 function switchTab(tab){
+  vibrate(15);
   state.tab = tab;
   document.getElementById('tabDiscover').classList.toggle('active', tab==='discover');
   document.getElementById('tabSelected').classList.toggle('active', tab==='selected');
