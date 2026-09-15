@@ -1,6 +1,13 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- iOS Safari doesn't implement navigator.vibrate() at all, but toggling a
+     native switch-styled checkbox (Safari 17.4+) fires the OS's real haptic
+     engine on every state change — vibrate() below clicks this as a fallback
+     when navigator.vibrate isn't available. Hidden, never meant to be seen. -->
+<input type="checkbox" switch id="haptic" style="display:none">
+<label for="haptic" id="hapticLabel" style="display:none"></label>
+
 <header>
   <div class="wrap">
     <div class="h-title">
