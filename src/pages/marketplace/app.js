@@ -828,10 +828,18 @@ function openModal(id){
   if(isReopen){ document.getElementById('modalBg').scrollTop = 0; } /* a refresh-in-place keeps the viewer's scroll position */
 }
 
+/* Haptic feedback for the SAVE/CONSIDER/DELETE decision buttons. Android
+   Chrome supports navigator.vibrate; iOS Safari doesn't expose it at all, so
+   this is a silent no-op there rather than an error. */
+function vibrate(pattern){
+  if(navigator.vibrate) navigator.vibrate(pattern);
+}
+
 function setStatus(id, status){
   var e = getEntry(id);
   e.status = (e.status===status) ? null : status;
   if(e.status!=='deleted') e.deleteReason = null;
+  vibrate(status==='deleted' ? [20,30,20] : 15);
   saveStore(store);
   openModal(id);
   render();
