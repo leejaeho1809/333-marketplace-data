@@ -829,17 +829,11 @@ function openModal(id){
   if(isReopen){ document.getElementById('modalBg').scrollTop = 0; } /* a refresh-in-place keeps the viewer's scroll position */
 }
 
-/* Haptic feedback for the SAVE/CONSIDER/DELETE decision buttons, category
-   filter chips, and tab switching. Android Chrome supports navigator.vibrate
-   directly. iOS Safari doesn't expose that API at all, but toggling a native
-   switch-styled checkbox (Safari 17.4+) triggers the OS's real haptic engine
-   as a side effect — #hapticLabel in the markup exists solely for this. */
+/* Haptic feedback for the SAVE/CONSIDER/DELETE decision buttons. Android
+   Chrome supports navigator.vibrate; iOS Safari doesn't expose it at all, so
+   this is a silent no-op there rather than an error. */
 function vibrate(pattern){
   if(navigator.vibrate) navigator.vibrate(pattern);
-  else {
-    var label = document.getElementById('hapticLabel');
-    if(label) label.click();
-  }
 }
 
 function setStatus(id, status){
