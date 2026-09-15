@@ -3,6 +3,13 @@ import { supabase } from '@/utils/supabase'
 import bodyHtml from './body.html?raw'
 import appScript from './app.js?raw'
 import './marketplace.css'
+// Side-effect import: polyfills navigator.vibrate on iOS/macOS Safari (which
+// has no native implementation) by simulating switch toggles under the hood.
+// app.js's own vibrate() helper just calls navigator.vibrate() normally —
+// once this import runs, that call works on iOS too, no changes needed there.
+// See https://vibrator.dev/ — only onclick-triggered vibration is reliable
+// (iOS 18.4+ requires a real click grant), which matches every call site here.
+import 'ios-vibrator-pro-max'
 
 const ACCESS_STORAGE_KEY = 'sauna333_access_granted'
 
