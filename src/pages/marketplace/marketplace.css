@@ -56,6 +56,8 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
   padding:22px 0; border-bottom:1px solid var(--line);
   display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
 }
+/* country row directly follows the category row — reads as one filter block */
+.country-filters-row{padding-top:0;}
 .filters{display:flex; gap:8px; flex-wrap:wrap;}
 .chip{
   background:none; border:1px solid var(--line); color:var(--stone);

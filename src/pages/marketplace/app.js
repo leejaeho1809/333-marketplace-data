@@ -1,6 +1,6 @@
 var CATEGORIES = ['ALL','BODY','RECOVERY','HYDRATION','SAUNA','FITNESS','SLEEP','LONGEVITY','SUPPLEMENT','LIFESTYLE'];
 
-var state = { tab:'discover', filter:'ALL', view:'grid', showDeleted:false };
+var state = { tab:'discover', filter:'ALL', countryFilters:[], view:'grid', showDeleted:false };
 
 function toggleShowDeleted(){
   state.showDeleted = !state.showDeleted;
@@ -568,6 +568,45 @@ function renderFilters(){
   });
 }
 
+/* Country chips: built from whatever countries are actually in the data right
+   now (not a fixed list), labeled with the Korean name already stored on each
+   brand (countryCode is just the grouping/filter key). Multi-select — unlike
+   the single-select category row above, clicking a country toggles it in
+   state.countryFilters instead of replacing the selection. */
+function renderCountryFilters(){
+  var bar = document.getElementById('countryFilterBar');
+  bar.innerHTML = '';
+
+  var seen = {};
+  var countries = [];
+  getAllBrands().forEach(function(b){
+    if(b.countryCode && !seen[b.countryCode]){
+      seen[b.countryCode] = true;
+      countries.push({code: b.countryCode, name: b.country || b.countryCode});
+    }
+  });
+  countries.sort(function(a, b){ return a.name.localeCompare(b.name, 'ko'); });
+
+  var allBtn = document.createElement('button');
+  allBtn.className = 'chip' + (state.countryFilters.length===0 ? ' active' : '');
+  allBtn.textContent = '전체';
+  allBtn.onclick = function(){ vibrate(15); state.countryFilters = []; render(); };
+  bar.appendChild(allBtn);
+
+  countries.forEach(function(c){
+    var btn = document.createElement('button');
+    btn.className = 'chip' + (state.countryFilters.indexOf(c.code)!==-1 ? ' active' : '');
+    btn.textContent = c.name;
+    btn.onclick = function(){
+      vibrate(15);
+      var idx = state.countryFilters.indexOf(c.code);
+      if(idx===-1) state.countryFilters.push(c.code); else state.countryFilters.splice(idx, 1);
+      render();
+    };
+    bar.appendChild(btn);
+  });
+}
+
 function switchTab(tab){
   vibrate(15);
   state.tab = tab;
@@ -593,6 +632,7 @@ function render(){
     return;
   }
   renderFilters();
+  renderCountryFilters();
   var grid = document.getElementById('cardGrid');
   grid.classList.toggle('list-view', state.view==='list');
   var empty = document.getElementById('emptyNote');
@@ -602,6 +642,7 @@ function render(){
     var entry = getEntry(b.id);
     if(state.tab==='selected' && entry.status!=='saved') return false;
     if(state.filter!=='ALL' && b.category.indexOf(state.filter)===-1) return false;
+    if(state.countryFilters.length && state.countryFilters.indexOf(b.countryCode)===-1) return false;
     if(entry.status==='deleted' && !state.showDeleted) return false;
     return true;
   });
