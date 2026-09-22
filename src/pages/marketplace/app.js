@@ -192,26 +192,102 @@ function removeCustomBrand(id){
    candidate to DISCOVER is just flipping that one column. */
 var candidateBrands = [];
 
+/* ---- Weekly hot-brand ranking (Instagram/TikTok mentions via Apify) ----
+   Populated from public.brand_weekly_hot on load. That table can hold many
+   past weeks; hotBrands only ever holds the single most recent week_start's
+   rows (top 5 by rank), which is what the ADD BRAND panel shows. Computed
+   on-demand (no cron), so it's normal for this to be empty or stale between
+   asks — the panel just hides itself when there's nothing to show. */
+var hotBrands = [];
+var hotWeekRange = null;
+
+/* Same move/delete footer every candidate card gets, whether it's rendered in
+   the hot-brands group or the regular grid below it — factored out so both
+   call sites stay identical instead of drifting apart. */
+function candidateFootHtml(id){
+  return '<div class="candidate-actions">' +
+      '<button class="candidate-move-btn" onclick="event.stopPropagation(); moveCandidateToDiscover(\'' + id + '\')">DISCOVER로 이동</button>' +
+      '<button class="candidate-delete-btn" onclick="event.stopPropagation(); deleteCandidate(\'' + id + '\')">삭제</button>' +
+    '</div>';
+}
+
+/* Renders the top-5 hot brands as full cards (same buildBrandCard as every
+   other grid — the raw mention count is intentionally NOT shown outright,
+   only the rank number; the total mention count is tucked behind a hover
+   tooltip on the rank badge, so the card itself still reads like a curation
+   nudge, not a stats dashboard). Returns the set of brand ids it drew, so
+   renderCandidates() can exclude them from the "rest" grid below instead of
+   showing the same brand twice. */
+function renderHotBrands(){
+  var panel = document.getElementById('hotBrandsPanel');
+  if(!panel) return {};
+  /* A brand can vanish from candidateBrands/brands between when the ranking
+     was computed and now (moved to DISCOVER and back, deleted, etc.) —
+     findBrandById covers both lists, but skip any that resolve to nothing.
+     Kept paired with its hotBrands row (not just mapped down to the brand)
+     so the rank/mention_count are still available when building the badge. */
+  var visible = hotBrands.map(function(h){ return {h: h, b: findBrandById(h.brand_id)}; })
+    .filter(function(x){ return x.b && getEntry(x.b.id).status !== 'deleted'; });
+
+  if(!visible.length){ panel.style.display = 'none'; return {}; }
+  panel.style.display = 'block';
+
+  var rangeEl = document.getElementById('hotBrandsRange');
+  if(rangeEl) rangeEl.textContent = hotWeekRange ? (formatHotDate(hotWeekRange.start) + ' – ' + formatHotDate(hotWeekRange.end)) : '';
+
+  var row = document.getElementById('hotBrandsRow');
+  row.innerHTML = '';
+  var shownIds = {};
+  visible.forEach(function(x){
+    var h = x.h, b = x.b;
+    var card = buildBrandCard(b, candidateFootHtml(b.id));
+    card.classList.add('hot-brand-card');
+    /* Sibling of .b-hero (not a child of it) so it isn't clipped by the
+       hero's own overflow:hidden, and a plain later-in-DOM absolutely
+       positioned element already paints above the hero without needing to
+       fight its internal z-index stack — the explicit z-index below just
+       makes that "above the image" requirement unambiguous. */
+    var badge = document.createElement('div');
+    badge.className = 'hot-rank-badge mono';
+    badge.textContent = h.rank;
+    badge.dataset.tooltip = '총 언급 ' + h.mention_count + '회';
+    card.insertBefore(badge, card.firstChild.nextSibling);
+    row.appendChild(card);
+    shownIds[b.id] = true;
+  });
+  return shownIds;
+}
+function formatHotDate(d){
+  if(!d) return '';
+  var parts = String(d).split('-');
+  return parts[1] + '.' + parts[2];
+}
+
 function renderCandidates(){
+  var hotShownIds = renderHotBrands();
+  var restLabel = document.getElementById('candidatesRestLabel');
   var grid = document.getElementById('candidateGrid');
   var emptyEl = document.getElementById('candidatesEmptyNote');
   grid.innerHTML = '';
   /* Soft-deleted candidates (getEntry(id).status==='deleted') stay in the
      brands table — deleteCandidate() no longer hard-deletes the row — so
-     they must be filtered out here to actually disappear from the tab. */
-  var visibleCandidates = candidateBrands.filter(function(b){ return getEntry(b.id).status !== 'deleted'; });
+     they must be filtered out here to actually disappear from the tab.
+     Brands already shown in the hot-brands group above are excluded too, so
+     nothing appears twice on the page. */
+  var visibleCandidates = candidateBrands.filter(function(b){
+    return getEntry(b.id).status !== 'deleted' && !hotShownIds[b.id];
+  });
   if(visibleCandidates.length === 0){
     emptyEl.style.display = 'block';
+    if(restLabel) restLabel.style.display = 'none';
     return;
   }
   emptyEl.style.display = 'none';
+  /* Only label this group "전체 후보" when it's sitting below a visible
+     hot-brands group — otherwise it's just the whole list and needs no label. */
+  if(restLabel) restLabel.style.display = Object.keys(hotShownIds).length ? 'block' : 'none';
   visibleCandidates.forEach(function(b){
-    var footHtml =
-      '<div class="candidate-actions">' +
-        '<button class="candidate-move-btn" onclick="event.stopPropagation(); moveCandidateToDiscover(\'' + b.id + '\')">DISCOVER로 이동</button>' +
-        '<button class="candidate-delete-btn" onclick="event.stopPropagation(); deleteCandidate(\'' + b.id + '\')">삭제</button>' +
-      '</div>';
-    grid.appendChild(buildBrandCard(b, footHtml));
+    grid.appendChild(buildBrandCard(b, candidateFootHtml(b.id)));
   });
 }
 
@@ -771,6 +847,38 @@ function openModal(id){
     ? '<a href="' + b.instagram + '" target="_blank" rel="noopener">Instagram ↗</a>'
     : '<span class="mono" style="color:var(--stone-light); font-size:12px;">Instagram 확인 필요</span>';
 
+  /* "Why Now" section — trend-research fields (why_now/momentum_stage/trend_signals/
+     re_surfaced), added 2026-09-22 for the country-scoped trend-brand pipeline. Only
+     brands researched through that pipeline have momentumStage set, so this whole
+     section is omitted for every brand from the regular brand-DNA pipeline instead of
+     showing an empty block. */
+  var whyNowHtml = '';
+  if(b.momentumStage){
+    var stageLabels = {EARLY_SIGNAL:'EARLY SIGNAL', EMERGING:'EMERGING', BREAKOUT:'BREAKOUT', MAINSTREAMING:'MAINSTREAMING'};
+    var stageClass = b.momentumStage.toLowerCase().replace(/_/g,'-');
+    var signals = b.trendSignals || [];
+    whyNowHtml =
+      '<div class="m-section">' +
+        '<div class="m-label">Why Now</div>' +
+        '<div class="momentum-badge-row">' +
+          '<span class="momentum-tag ' + stageClass + ' mono">' + (stageLabels[b.momentumStage] || b.momentumStage) + '</span>' +
+          (b.reSurfaced ? '<span class="resurfaced-tag mono">RE-SURFACED</span>' : '') +
+        '</div>' +
+        (b.whyNow ? '<div class="why-now-text">' + b.whyNow + '</div>' : '') +
+        (b.reSurfaced && b.reSurfacedReason ? '<div class="resurfaced-reason">' + b.reSurfacedReason + '</div>' : '') +
+        (signals.length ?
+          '<div class="trend-signals">' +
+            signals.map(function(s){
+              return '<div class="signal-row">' +
+                '<span class="signal-platform mono">' + (s.platform || '') + '</span>' +
+                '<span class="signal-date mono">' + (s.date || '') + '</span>' +
+                '<span class="signal-evidence">' + (s.evidence || '') + '</span>' +
+              '</div>';
+            }).join('') +
+          '</div>' : '') +
+      '</div>';
+  }
+
   var reasons = ['Price','Visual mismatch','Product mismatch','Difficult to import','Too common','Weak brand identity','Not suitable for offline experience','Other'];
   var reasonsHtml = reasons.map(function(r){
     var active = entry.deleteReason===r ? ' active' : '';
@@ -790,6 +898,8 @@ function openModal(id){
       '<div class="m-name">' + b.name + '</div>' +
       '<div class="m-meta mono">' + b.country + ' · ' + b.category.join(' · ') + '</div>' +
       '<div class="m-phil">' + b.philosophy + '</div>' +
+
+      whyNowHtml +
 
       '<div class="m-section">' +
         '<div class="m-label">Representative Products</div>' +
@@ -1175,11 +1285,12 @@ function initSupabaseSync(){
     return Promise.all([
       sb.from('brand_entries').select('*'),
       sb.from('brands_view').select('*'),
-      sb.from('brand_images').select('*')
+      sb.from('brand_images').select('*'),
+      sb.from('brand_weekly_hot').select('*').order('week_start', {ascending:false}).order('rank', {ascending:true}).limit(300)
     ]).then(function(results){
       if(!isCurrentSyncGen()) return;
       results.forEach(throwIfError);
-      var entriesRes = results[0], brandsRes = results[1], imagesRes = results[2];
+      var entriesRes = results[0], brandsRes = results[1], imagesRes = results[2], hotRes = results[3];
 
       store = {};
       syncedEntries = {};
@@ -1198,6 +1309,14 @@ function initSupabaseSync(){
 
       imageCache = {};
       imagesRes.data.forEach(function(row){ imageCache[row.id] = imagePublicUrl(row.id, row.updated_at); });
+
+      /* Already sorted week_start desc, rank asc by the query above, so all
+         rows belonging to the latest week_start come first, already in rank
+         order — just take that leading run and cap it at 5 for display. */
+      var hotRows = hotRes.data || [];
+      var latestWeekStart = hotRows.length ? hotRows[0].week_start : null;
+      hotBrands = latestWeekStart ? hotRows.filter(function(r){ return r.week_start === latestWeekStart; }).slice(0, 5) : [];
+      hotWeekRange = latestWeekStart ? {start: latestWeekStart, end: hotRows[0].week_end} : null;
 
       render();
     }).catch(function(err){ console.error('initial load error', err); });

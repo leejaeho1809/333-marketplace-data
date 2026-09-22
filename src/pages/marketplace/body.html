@@ -47,6 +47,17 @@
       <div class="api-note">다른 에이전트가 웹 리서치로 찾아낸 브랜드 후보 목록이에요. 마음에 들면 DISCOVER로 옮기고, 직접 아는 브랜드는 바로 추가하세요.</div>
       <button class="add-fab" onclick="openAddModal()">+ Add Brand</button>
     </div>
+
+    <div class="hot-brands-panel" id="hotBrandsPanel" style="display:none;">
+      <div class="hot-brands-head">
+        <span class="hot-brands-title">🔥 이번 주 핫 브랜드</span>
+        <span class="hot-brands-range mono" id="hotBrandsRange"></span>
+      </div>
+      <div class="card-grid" id="hotBrandsRow"></div>
+      <div class="hot-brands-caveat">인스타그램·틱톡 언급량 기준 집계 (참고용 — 일반 단어와 겹치는 브랜드명은 오탐 가능)</div>
+    </div>
+
+    <div class="candidates-rest-label" id="candidatesRestLabel" style="display:none;">전체 후보</div>
     <div class="card-grid" id="candidateGrid"></div>
     <div class="empty-note" id="candidatesEmptyNote" style="display:none;">아직 등록된 후보 브랜드가 없어요.</div>
   </div>

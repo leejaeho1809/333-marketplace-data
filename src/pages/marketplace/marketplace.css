@@ -220,6 +220,57 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
   padding:8px 10px; cursor:pointer;
 }
 .candidate-delete-btn:hover{border-color:#B5645A; color:#B5645A;}
+
+/* ADD BRAND tab: weekly hot-brand ranking (Instagram/TikTok mentions, computed
+   by an on-demand Apify pass, stored in brand_weekly_hot). Sits above the
+   candidate grid, shown as the same brand cards as the rest of the tab (just
+   the top 5, mention counts hidden — this is a curation nudge, not a stats
+   dashboard); hidden entirely if no ranking has been computed yet. The
+   remaining candidates render below under .candidates-rest-label so the two
+   groups read as separate, not one merged grid. */
+.hot-brands-panel{
+  margin-bottom:40px; padding-bottom:36px; border-bottom:1px solid var(--line);
+}
+.hot-brands-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:24px;}
+.hot-brands-title{font-size:15px; font-weight:600;}
+.hot-brands-range{font-size:11px; color:var(--stone);}
+.hot-brands-caveat{margin-top:24px; font-size:11px; color:var(--stone-light); line-height:1.5;}
+.candidates-rest-label{
+  font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.04em;
+  color:var(--stone); text-transform:uppercase; margin-bottom:20px;
+}
+
+/* Rank badge on hot-brand cards — sibling of .b-hero (not a child of it, so
+   the hero's own overflow:hidden never clips it or its hover tooltip), sits
+   at the hero's top-left corner and paints above the image. The mention
+   count stays hidden until hover (a help-bubble tooltip), matching the
+   "no visible numbers by default" rule for this panel. */
+.hot-brand-card{position:relative;}
+.hot-rank-badge{
+  position:absolute; top:10px; left:10px; z-index:5;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--blue); border:2px solid var(--bg); color:#fff;
+  font-size:18px; font-weight:700;
+  box-shadow:0 1px 4px rgba(5,7,7,0.35);
+  display:flex; align-items:center; justify-content:center;
+  cursor:default;
+}
+.hot-rank-badge::after{
+  content:attr(data-tooltip);
+  position:absolute; bottom:calc(100% + 8px); left:0;
+  background:var(--ink); color:var(--bg);
+  font-family:'IBM Plex Sans KR',sans-serif; font-size:11.5px; font-weight:500;
+  padding:6px 10px; white-space:nowrap;
+  opacity:0; pointer-events:none; transform:translateY(4px);
+  transition:opacity 0.15s ease, transform 0.15s ease;
+  z-index:10;
+}
+.hot-rank-badge::before{
+  content:''; position:absolute; bottom:calc(100% + 3px); left:8px;
+  border:5px solid transparent; border-top-color:var(--ink);
+  opacity:0; pointer-events:none; transition:opacity 0.15s ease;
+}
+.hot-rank-badge:hover::after, .hot-rank-badge:hover::before{ opacity:1; transform:translateY(0); }
 .add-modal{max-width:520px;}
 .af-imgdrop{
   position:relative; margin-top:20px;
@@ -315,6 +366,37 @@ header .wrap{display:flex; align-items:center; justify-content:space-between; fl
 .why-fit{margin-top:14px; font-size:14px; line-height:1.75; color:var(--ink);}
 .potential-list{display:flex; flex-wrap:wrap; gap:8px;}
 .pot-tag{font-size:12px; color:var(--stone); border:1px solid var(--line); padding:6px 12px;}
+
+/* "Why Now" modal section — trend-research fields (momentum stage, why-now
+   narrative, trend signals, re-surfaced flag). Only rendered when a brand has
+   momentumStage set (i.e. came through the country-scoped trend pipeline, not
+   the regular brand-DNA one), so this stays out of the way for every other
+   brand card. */
+.momentum-badge-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+.momentum-tag{
+  font-size:10.5px; letter-spacing:0.03em; text-transform:uppercase;
+  padding:6px 12px; border:1px solid var(--stone);
+  color:var(--stone);
+}
+.momentum-tag.early-signal{border-color:var(--stone); color:var(--stone);}
+.momentum-tag.emerging{border-color:var(--blue); color:var(--blue);}
+.momentum-tag.breakout{background:var(--ink); border-color:var(--ink); color:var(--bg);}
+.momentum-tag.mainstreaming{border-color:var(--stone-light); color:var(--stone-light);}
+.resurfaced-tag{
+  font-size:10.5px; letter-spacing:0.03em; text-transform:uppercase;
+  padding:6px 12px; border:1px solid var(--cream); background:var(--cream); color:#9a8f4f;
+}
+.why-now-text{margin-top:14px; font-size:13.5px; line-height:1.75; color:var(--ink);}
+.resurfaced-reason{margin-top:8px; font-size:12.5px; line-height:1.65; color:#9a8f4f;}
+.trend-signals{margin-top:16px; display:flex; flex-direction:column; gap:10px;}
+.signal-row{
+  display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline;
+  padding-bottom:10px; border-bottom:1px solid var(--line);
+}
+.signal-row:last-child{border-bottom:none; padding-bottom:0;}
+.signal-platform{font-size:10.5px; color:var(--blue); flex-shrink:0;}
+.signal-date{font-size:10.5px; color:var(--stone-light); flex-shrink:0;}
+.signal-evidence{font-size:12.5px; line-height:1.55; color:var(--stone); flex:1; min-width:180px;}
 .link-row{display:flex; gap:16px; margin-top:6px;}
 .link-row a{font-size:13px; color:var(--blue); text-decoration:none;}
 .link-row a:hover{text-decoration:underline;}
