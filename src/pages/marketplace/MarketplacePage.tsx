@@ -1,41 +1,93 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { supabase } from '@/utils/supabase'
-import bodyHtml from './body.html?raw'
-import appScript from './app.js?raw'
-import './marketplace.css'
+import { MarketplaceProvider, useMarketplace } from '@/context/MarketplaceProvider'
+import { useScrollLock } from '@/hooks/useScrollLock'
+import { Header } from '@/components/marketplace/Header'
+import { CategoryFilterBar, CountryFilterBar, ViewToggle } from '@/components/marketplace/FilterBar'
+import { DiscoverDeck } from '@/components/marketplace/DiscoverDeck'
+import { CandidatesTab } from '@/components/marketplace/CandidatesTab'
+import { DetailModal } from '@/components/marketplace/DetailModal'
+import { AddEditBrandModal } from '@/components/marketplace/AddEditBrandModal'
+import { Toast } from '@/components/marketplace/Toast'
+import type { TabId, ViewMode } from '@/types/marketplace'
 
 const ACCESS_STORAGE_KEY = 'sauna333_access_granted'
 
-/**
- * Ported from the original static HTML page (Firebase/Firestore-backed).
- * The markup and app logic are kept as-is on purpose — only the sync layer
- * at the bottom of app.js was rewritten to talk to Supabase instead of
- * Firestore, with the DB layer swapped and Realtime added so every open tab
- * sees the same edits live. See src/pages/marketplace/app.js for the details.
- */
 function MarketplaceContent() {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const { brands } = useMarketplace()
 
-  useEffect(() => {
-    // app.js is loaded as raw text and injected as a real <script> tag so its
-    // top-level `var`/`function` declarations become globals, exactly like the
-    // original inline <script> did — the markup's inline onclick="..." handlers
-    // (both static and the ones render() builds dynamically) depend on that.
-    ;(window as unknown as { __supabase: typeof supabase }).__supabase = supabase
+  const [tab, setTab] = useState<TabId>('discover')
+  const [filter, setFilter] = useState('ALL')
+  const [countryFilters, setCountryFilters] = useState<string[]>([])
+  const [view, setView] = useState<ViewMode>('grid')
+  const [showDeleted, setShowDeleted] = useState(false)
 
-    const script = document.createElement('script')
-    script.textContent = appScript
-    document.body.appendChild(script)
+  const [detailBrandId, setDetailBrandId] = useState<string | null>(null)
+  const [addModal, setAddModal] = useState<{ open: boolean; editId: string | null }>({ open: false, editId: null })
 
-    return () => {
-      const cleanup = (window as unknown as { __marketplaceCleanup?: () => void })
-        .__marketplaceCleanup
-      cleanup?.()
-      script.remove()
-    }
-  }, [])
+  const { lock, unlock } = useScrollLock()
 
-  return <div ref={containerRef} dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+  function openDetail(id: string) {
+    setDetailBrandId(id)
+  }
+  function closeDetail() {
+    setDetailBrandId(null)
+  }
+  function openAddModal() {
+    setAddModal({ open: true, editId: null })
+  }
+  function openEditModal(id: string) {
+    setDetailBrandId(null) /* only one modal is ever open at a time */
+    setAddModal({ open: true, editId: id })
+  }
+  function closeAddModal() {
+    setAddModal({ open: false, editId: null })
+  }
+
+  return (
+    <div>
+      <Toast />
+      <Header tab={tab} onTabChange={setTab} />
+
+      <div className="mx-auto max-w-[1180px] px-10 max-[560px]:px-5">
+        {tab !== 'candidates' && (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line py-[22px]">
+              <CategoryFilterBar filter={filter} onChange={setFilter} />
+              <ViewToggle view={view} onChange={setView} />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pt-3.5 pb-[22px]">
+              <CountryFilterBar
+                brands={brands}
+                selected={countryFilters}
+                onToggle={(code) =>
+                  setCountryFilters((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]))
+                }
+                onClear={() => setCountryFilters([])}
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'candidates' ? (
+          <CandidatesTab onOpenBrand={openDetail} onOpenAddModal={openAddModal} />
+        ) : (
+          <DiscoverDeck
+            tab={tab}
+            filter={filter}
+            countryFilters={countryFilters}
+            view={view}
+            showDeleted={showDeleted}
+            onToggleShowDeleted={() => setShowDeleted((v) => !v)}
+            onOpenBrand={openDetail}
+          />
+        )}
+      </div>
+
+      <DetailModal brandId={detailBrandId} onClose={closeDetail} onEdit={openEditModal} lock={lock} unlock={unlock} />
+      <AddEditBrandModal open={addModal.open} editId={addModal.editId} onClose={closeAddModal} lock={lock} unlock={unlock} />
+    </div>
+  )
 }
 
 /**
@@ -77,14 +129,11 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   }
 
   return (
-    <div
-      className="flex min-h-svh items-center justify-center bg-[#F7F7F7] px-6"
-      style={{ fontFamily: "'IBM Plex Sans KR', sans-serif" }}
-    >
+    <div className="flex min-h-svh items-center justify-center bg-bg px-6 font-sans">
       <form onSubmit={handleSubmit} className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="text-xl text-[#79ABD5]">333°</div>
-          <div className="mt-2 font-mono text-xs tracking-wide text-[#7C898D]">
+          <div className="text-xl text-blue">333°</div>
+          <div className="mt-2 font-mono text-xs tracking-wide text-stone">
             WELLNESS MARKETPLACE — BRAND RESEARCH DECK
           </div>
         </div>
@@ -94,13 +143,13 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="비밀번호"
-          className="w-full border border-[#D8D9D4] bg-white px-4 py-3 text-sm text-[#050707] outline-none focus:border-[#79ABD5]"
+          className="w-full border border-line bg-white px-4 py-3 text-sm text-ink outline-none focus:border-blue"
         />
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={checking || !password}
-          className="mt-4 w-full bg-[#050707] py-3 text-sm font-medium text-white transition-opacity disabled:opacity-40"
+          className="mt-4 w-full bg-ink py-3 text-sm font-medium text-white transition-opacity disabled:opacity-40"
         >
           {checking ? '확인 중...' : '입장'}
         </button>
@@ -122,7 +171,11 @@ function MarketplacePage() {
     return <PasswordGate onUnlock={() => setUnlocked(true)} />
   }
 
-  return <MarketplaceContent />
+  return (
+    <MarketplaceProvider>
+      <MarketplaceContent />
+    </MarketplaceProvider>
+  )
 }
 
 export default MarketplacePage
