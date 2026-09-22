@@ -614,6 +614,7 @@ function switchTab(tab){
   document.getElementById('tabSelected').classList.toggle('active', tab==='selected');
   document.getElementById('tabAdd').classList.toggle('active', tab==='candidates');
   document.getElementById('discoverFiltersRow').style.display = tab==='candidates' ? 'none' : 'flex';
+  document.getElementById('discoverCountryFiltersRow').style.display = tab==='candidates' ? 'none' : 'flex';
   document.getElementById('discoverDeck').style.display = tab==='candidates' ? 'none' : 'block';
   document.getElementById('candidatesDeck').style.display = tab==='candidates' ? 'block' : 'none';
   render();
