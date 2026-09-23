@@ -1,0 +1,87 @@
+[
+ {
+  "brand": "HUUM",
+  "origin": "에스토니아",
+  "name": "TASA Sand Timer (15분 사우나 모래시계)",
+  "cat": "L",
+  "sub": "사우나 모래시계",
+  "url": "https://huum.eu/product/sand-timer/",
+  "ig": null,
+  "price": "US$90 정가 (약 12.4만원) / 미국 리테일러 현재가 US$68 (약 9.4만원)",
+  "wholesale": "문의 필요",
+  "fit": "히터 브랜드로 알려진 HUUM이 2026년 내놓은 TASA 액세서리 라인의 첫 소품으로, 사우나 룸 벽에 걸어 세션 길이를 눈으로 재게 하는 물건입니다. 333˚ 열탕실 벽에 하나 걸고 리테일 코너에서 같은 것을 파는 '관내에서 쓰는 것을 그대로 판다' 구성이 가장 잘 먹히는 품목입니다. 전자 타이머 없이 15분을 세는 방식 자체가 멤버 온보딩 설명 도구가 됩니다.",
+  "edge": "히터 제조사가 만든 액세서리라 열·습도 내구 설계가 다르고, 국내 유통 미확인",
+  "story": "HUUM은 에스토니아 탈린 기반의 사우나 히터 제조사로, 돌망 구조를 노출한 HIVE 히터로 북유럽 사우나 시장에서 자리를 잡았습니다. 2026년 TASA 라인을 통해 히터 밖의 사우나 도구까지 같은 조형 언어로 확장했습니다.",
+  "design": "삼나무 프레임 + 내열 유리 + 모래, 세 가지 재료만 쓰고 로고도 각인 수준이라 DAVIDs 알루미늄 튜브 옆에 그대로 세울 수 있습니다.",
+  "krStatus": "미확인",
+  "verified": "공식 제품 페이지(huum.eu)에서 제품명·치수·소재 확인, 가격은 미국 리테일러 cedar-sense.com 제품 페이지에서 정가 $90 / 현재가 $68 및 재고 있음 확인",
+  "sources": [
+   {
+    "t": "HUUM 공식 제품 페이지 — Sand Timer",
+    "u": "https://huum.eu/product/sand-timer/"
+   },
+   {
+    "t": "HUUM 사우나 액세서리 카테고리",
+    "u": "https://huum.eu/product-category/sauna-accessories/"
+   },
+   {
+    "t": "Cedar Sense — HUUM TASA Sand Timer 가격",
+    "u": "https://cedar-sense.com/product/huum-tasa-sauna-sand-timer-white/"
+   }
+  ]
+ },
+ {
+  "brand": "KOLO Sauna",
+  "origin": "핀란드",
+  "name": "KOLO Bucket and Ladle Set (알루미늄 물통 + 대나무 손잡이 래들)",
+  "cat": "L",
+  "sub": "사우나 버킷·래들",
+  "url": "https://kolosauna.fi/en/",
+  "ig": null,
+  "price": "US$119 (약 16.4만원)",
+  "wholesale": "문의 필요",
+  "fit": "3.8L 알루미늄 버킷과 대나무 손잡이 래들 한 세트로, 뢰윌리를 붓는 동작이 그대로 보이는 도구입니다. 관내에서는 각 사우나 룸의 기본 세트로 쓰고, 리테일에서는 홈사우나·아파트 발코니 사우나를 갖춘 멤버에게 '333˚가 쓰는 그 버킷'으로 판매하기 좋습니다. 래들이 버킷 구멍에 끼워져 손잡이가 되는 구조라 진열대에서 하나의 오브제로 세워둘 수 있습니다.",
+  "edge": "알루미늄 바디 + 대나무 손잡이 조합의 핀란드 제조 세트, 국내 미유통(확인된 국내 채널 없음)",
+  "story": "KOLO는 핀란드 사우나 도구만 만드는 소규모 브랜드로, '새지 않는 버킷과 무게를 견디는 래들'이라는 최소한의 약속만 내겁니다. 장식적 요소를 배제하고 구조와 재료로만 승부하는 노르딕 기능주의 계열입니다.",
+  "design": "무광 파우더코팅 알루미늄 단색 바디에 그래픽이 전혀 없고, 손잡이만 무처리 대나무입니다.",
+  "krStatus": "미확인",
+  "verified": "브랜드 공식 사이트(kolosauna.fi)에서 제품 라인업 확인, 가격 US$119·재고 있음·핀란드 제조는 리테일러 thesaunaheater.com 제품 페이지에서 확인",
+  "sources": [
+   {
+    "t": "KOLO Sauna 공식 사이트",
+    "u": "https://kolosauna.fi/en/"
+   },
+   {
+    "t": "The Sauna Heater — KOLO Bucket and Ladle Set 가격",
+    "u": "https://thesaunaheater.com/products/kolo-bucket-and-ladle-set"
+   }
+  ]
+ },
+ {
+  "brand": "Emendo",
+  "origin": "핀란드",
+  "name": "Sauna Set — Steel Sauna Pail & Steel Ladle (4.2L)",
+  "cat": "L",
+  "sub": "사우나 버킷·래들",
+  "url": "https://emendo.fi/en/product/sauna-bucket-and-ladle-steel/",
+  "ig": null,
+  "price": "€31.99 (부가세 포함) (약 5.1만원)",
+  "wholesale": "문의 필요",
+  "fit": "4.2L 스틸 버킷과 42cm 스틸 래들의 세트로, KOLO보다 가격대가 낮아 리테일 코너의 '입문 가격대' 사우나 기물 자리를 채웁니다. 관내에서는 예비 버킷·아우프구스용 보조 버킷으로 소모품처럼 굴릴 수 있고, 워크인 손님이 부담 없이 집어 갈 수 있는 5만원대 물건이 지금 리스트에 거의 없습니다.",
+  "edge": "스틸 단일 소재 세트가 5만원대, 핀란드 디자인 / 에스토니아 핸드메이드",
+  "story": "Emendo는 핀란드 사우나 용품을 도매 중심으로 공급하는 회사로, 향·텍스타일·버킷까지 사우나 한 채에 필요한 품목을 자사 라인으로 갖추고 있습니다. 자체몰에 가격을 노출하지 않고 리셀러를 통해 판매하는 전형적인 B2B 구조입니다.",
+  "design": "표면 처리 없는 스틸 몸체와 같은 재질의 래들만으로 구성돼, 색·패턴·로고가 개입할 여지가 없습니다.",
+  "krStatus": "미확인",
+  "verified": "Emendo 공식 제품 페이지에서 제품 존재·소재 확인(공식몰은 가격 비노출), 가격 €31.99·용량 4.2L·래들 42cm·재고 있음은 유럽 리테일러 sauna-store.com 제품 페이지에서 확인",
+  "sources": [
+   {
+    "t": "Emendo 공식 제품 페이지",
+    "u": "https://emendo.fi/en/product/sauna-bucket-and-ladle-steel/"
+   },
+   {
+    "t": "Sauna-store.com — Emendo Sauna Set 가격·사양",
+    "u": "https://www.sauna-store.com/product/812/emendo-sauna-set-steel-sauna-pail--steel-ladle"
+   }
+  ]
+ }
+]

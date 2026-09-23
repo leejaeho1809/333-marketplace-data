@@ -1,0 +1,167 @@
+[
+ {
+  "brand": "Bathing Culture",
+  "product": "Mind and Body Wash (16 fl oz)",
+  "cat": "B",
+  "sub": "바디워시 · 리필형",
+  "origin": "미국 (샌프란시스코)",
+  "url": "https://bathingculture.com",
+  "priceSrc": "https://bathingculture.com/products/16oz",
+  "price": "$36 (약 5만원)",
+  "ig": {
+   "handle": "@bathingculture",
+   "url": "https://instagram.com/bathingculture",
+   "followers": "미확인"
+  },
+  "design": "...",
+  "story": "...",
+  "why333": "...",
+  "edge": "...",
+  "krDist": "미확인",
+  "verified": "공식몰 제품페이지에서 제품명·용량·가격 $36 확인",
+  "confidence": "높음",
+  "sources": [
+   {
+    "t": "제품페이지",
+    "u": "https://bathingculture.com/products/16oz"
+   }
+  ],
+  "addedOn": "2026-08-28",
+  "id": "p001",
+  "v": "fit",
+  "subCode": "B1",
+  "subName": "세정 — 비누·워시·샴푸"
+ },
+ {
+  "brand": "Bathing Culture",
+  "product": "Mind and Body Bar",
+  "cat": "B",
+  "sub": "비누",
+  "origin": "미국 (샌프란시스코)",
+  "url": "https://bathingculture.com",
+  "priceSrc": "https://bathingculture.com/products/bar",
+  "price": "$14 (약 1.9만원)",
+  "ig": {
+   "handle": "@bathingculture",
+   "url": "https://instagram.com/bathingculture",
+   "followers": "미확인"
+  },
+  "design": "...",
+  "story": "...",
+  "why333": "...",
+  "edge": "...",
+  "krDist": "미확인",
+  "verified": "공식몰 제품페이지에서 제품명·가격 $14 확인",
+  "confidence": "높음",
+  "sources": [
+   {
+    "t": "제품페이지",
+    "u": "https://bathingculture.com/products/bar"
+   }
+  ],
+  "addedOn": "2026-08-28",
+  "id": "p002",
+  "v": "",
+  "subCode": "B1",
+  "subName": "세정 — 비누·워시·샴푸"
+ },
+ {
+  "brand": "Bathing Culture",
+  "product": "Perfume Oil (3 scents)",
+  "cat": "B",
+  "sub": "향수 · 오일",
+  "origin": "미국 (샌프란시스코)",
+  "url": "https://bathingculture.com",
+  "priceSrc": "https://bathingculture.com/products/oil",
+  "price": "$48 (약 6.6만원)",
+  "ig": {
+   "handle": "@bathingculture",
+   "url": "https://instagram.com/bathingculture",
+   "followers": "미확인"
+  },
+  "design": "...",
+  "story": "...",
+  "why333": "...",
+  "edge": "...",
+  "krDist": "미확인",
+  "verified": "공식몰 제품페이지에서 제품명·가격 $48 확인",
+  "confidence": "높음",
+  "sources": [
+   {
+    "t": "제품페이지",
+    "u": "https://bathingculture.com/products/oil"
+   }
+  ],
+  "addedOn": "2026-08-28",
+  "id": "p003",
+  "v": "hold",
+  "subCode": "B2",
+  "subName": "향 — 향수·캔들·향 원액"
+ },
+ {
+  "brand": "Ippodo Tea (一保堂茶舗)",
+  "product": "Gokujo Hojicha (極上ほうじ茶) 100g",
+  "cat": "F",
+  "sub": "호지차",
+  "origin": "일본 (교토)",
+  "url": "https://global.ippodo-tea.co.jp",
+  "priceSrc": "https://global.ippodo-tea.co.jp/products/gokujo-hojicha",
+  "price": "¥1,080 (약 1.0만원)",
+  "ig": {
+   "handle": "미확인",
+   "url": "",
+   "followers": "미확인"
+  },
+  "design": "...",
+  "story": "...",
+  "why333": "...",
+  "edge": "...",
+  "krDist": "미확인",
+  "verified": "공식몰 제품페이지에서 제품명·중량 100g·가격 ¥1,080 확인",
+  "confidence": "높음",
+  "sources": [
+   {
+    "t": "제품페이지",
+    "u": "https://global.ippodo-tea.co.jp/products/gokujo-hojicha"
+   }
+  ],
+  "addedOn": "2026-08-28",
+  "id": "p004",
+  "v": "",
+  "subCode": "F2",
+  "subName": "차 — 블렌드·말차·호지차"
+ },
+ {
+  "brand": "LMNT",
+  "product": "Recharge Electrolyte (30 sticks)",
+  "cat": "S",
+  "sub": "전해질 스틱",
+  "origin": "미국",
+  "url": "https://drinklmnt.com",
+  "priceSrc": "https://drinklmnt.com/products/recharge",
+  "price": "$45 (약 6.2만원)",
+  "ig": {
+   "handle": "@drinklmnt",
+   "url": "https://instagram.com/drinklmnt",
+   "followers": "미확인"
+  },
+  "design": "...",
+  "story": "...",
+  "why333": "...",
+  "edge": "...",
+  "krDist": "미확인",
+  "verified": "공식몰 제품페이지에서 제품명·수량 30스틱·가격 $45 확인",
+  "confidence": "높음",
+  "sources": [
+   {
+    "t": "제품페이지",
+    "u": "https://drinklmnt.com/products/recharge"
+   }
+  ],
+  "addedOn": "2026-08-28",
+  "id": "p005",
+  "v": "",
+  "subCode": "S1",
+  "subName": "미네랄 — 발한 직후 재충전"
+ }
+]

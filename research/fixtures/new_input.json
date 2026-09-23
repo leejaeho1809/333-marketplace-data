@@ -1,0 +1,91 @@
+[
+ {
+  "brand": "KOLO Sauna",
+  "name": "Bucket and Ladle Set",
+  "cat": "L",
+  "sub": "사우나 버킷·래들",
+  "origin": "핀란드",
+  "url": "https://kolosauna.fi/en/",
+  "price": "US$119 (약 16.4만원)",
+  "ig": null,
+  "design": "무광 알루미늄 단색 바디",
+  "story": "핀란드 소규모 사우나 도구 브랜드",
+  "fit": "각 사우나 룸 기본 세트로 쓰고 같은 것을 리테일에서 판다",
+  "edge": "국내 미유통",
+  "krStatus": "미확인",
+  "verified": "공식 사이트에서 라인업 확인, 가격·재고는 리테일러 페이지에서 확인",
+  "wholesale": "문의 필요",
+  "sources": [
+   {
+    "t": "KOLO 공식",
+    "u": "https://kolosauna.fi/en/"
+   }
+  ]
+ },
+ {
+  "brand": "Bathing  Culture",
+  "name": "Mind and Body Bar!",
+  "cat": "B",
+  "sub": "비누",
+  "origin": "미국",
+  "url": "https://bathingculture.com",
+  "price": "$14 (약 1.9만원)",
+  "ig": "bathingculture",
+  "design": "x",
+  "story": "x",
+  "fit": "x",
+  "edge": "x",
+  "krStatus": "미확인",
+  "verified": "x",
+  "sources": [
+   {
+    "t": "x",
+    "u": "https://bathingculture.com"
+   }
+  ]
+ },
+ {
+  "brand": "Bathing Culture",
+  "name": "Gift Box: Scented Candle + Soap",
+  "cat": "B",
+  "sub": "캔들",
+  "origin": "미국",
+  "url": "https://bathingculture.com",
+  "price": "$68 (약 9.4만원)",
+  "ig": "bathingculture",
+  "design": "x",
+  "story": "x",
+  "fit": "x",
+  "edge": "x",
+  "krStatus": "미확인",
+  "verified": "공식몰에서 가격 확인",
+  "sources": [
+   {
+    "t": "x",
+    "u": "https://bathingculture.com"
+   }
+  ]
+ },
+ {
+  "brand": "Kaurilan Sauna",
+  "name": "Sauna Soap Bar",
+  "cat": "B",
+  "sub": "비누",
+  "origin": "핀란드",
+  "url": "https://kaurilansauna.com",
+  "price": "미확인",
+  "ig": null,
+  "design": "x",
+  "story": "x",
+  "fit": "x",
+  "edge": "x",
+  "krStatus": "미확인",
+  "verified": "제품 페이지 확인, 가격은 JS 위젯 뒤에 있어 미확인",
+  "sources": [
+   {
+    "t": "x",
+    "u": "https://kaurilansauna.com"
+   }
+  ]
+ }
+]

@@ -1,0 +1,235 @@
+[
+ {
+  "g": "뷰티",
+  "code": "B",
+  "note": "열이 빠지는 30분",
+  "items": [
+   {
+    "c": "B1",
+    "n": "세정 — 비누·워시·샴푸",
+    "cnt": 14,
+    "brands": [
+     "BINU BINU",
+     "Bathing Culture",
+     "FRAMA",
+     "Kaurilan Sauna",
+     "Klar Seifen",
+     "Le Baigneur",
+     "Sangre de Fruta",
+     "Soeder",
+     "Tangent GC",
+     "Yuan (阿原)"
+    ],
+    "ex": "Mind and Body Wash Refillabl · Mind and Body Bar · The Bathhouse Ritual Soap Du"
+   },
+   {
+    "c": "B2",
+    "n": "향 — 향수·캔들·향 원액",
+    "cnt": 5,
+    "brands": [
+     "Bathing Culture",
+     "FRAMA",
+     "Rento",
+     "Tangent GC",
+     "The Nue Co."
+    ],
+    "ex": "Perfume Oil (3 scents) · Gift Box: Scented Candle + S · Forest Lungs"
+   },
+   {
+    "c": "B3",
+    "n": "바디 — 오일·크림·데오",
+    "cnt": 5,
+    "brands": [
+     "Act+Acre",
+     "CORPUS",
+     "Sangre de Fruta",
+     "Soeder",
+     "Susanne Kaufmann"
+    ],
+    "ex": "Scalp Relief System · Serene Wood Hand Cream 30ml · Natural Deodorant Stick — Sa"
+   }
+  ],
+  "cnt": 24
+ },
+ {
+  "g": "식품",
+  "code": "F",
+  "note": "다시 채우는 것",
+  "items": [
+   {
+    "c": "F1",
+    "n": "논알콜 — 아페리티프·소다·비터스",
+    "cnt": 17,
+    "brands": [
+     "All The Bitter",
+     "Botivo",
+     "Casamara Club",
+     "DRAM Apothecary",
+     "De Soi",
+     "Everleaf",
+     "Ghia",
+     "MURI",
+     "NON",
+     "REAL (Real Alcohol Free)",
+     "Three Spirit"
+    ],
+    "ex": "Original Apéritif (500ml) · Le Spritz Ghia-Soda (4-pack) · COMO — Alpine-style botanica"
+   },
+   {
+    "c": "F2",
+    "n": "차 — 블렌드·말차·호지차",
+    "cnt": 8,
+    "brands": [
+     "April Coffee Roasters",
+     "BELLOCQ",
+     "Bellocq",
+     "Ippodo Tea (一保堂茶舗)",
+     "Kettl",
+     "Postcard Teas",
+     "Smith Teamaker"
+    ],
+    "ex": "No. 122, Nocturne · Hibari Matcha · Gokujo Hojicha (極上ほうじ茶) 100g"
+   },
+   {
+    "c": "F3",
+    "n": "커피 — 원두·드립",
+    "cnt": 3,
+    "brands": [
+     "Coffee Collective",
+     "La Cabra"
+    ],
+    "ex": "Kieni, 250g (케냐 뇌리, 워시드) · Luna, 250g · Arbegona, 250g (에티오피아)"
+   },
+   {
+    "c": "F4",
+    "n": "주방·스낵 — 집으로 가져가는 맛",
+    "cnt": 5,
+    "brands": [
+     "Borough Broth Co.",
+     "Dandelion Chocolate",
+     "Fishwife",
+     "Graza",
+     "Jacobsen Co."
+    ],
+    "ex": "The Starter Pack (7종) · Drizzle Extra Virgin Olive O · Río Samaria, Mexico 2026, 70"
+   }
+  ],
+  "cnt": 33
+ },
+ {
+  "g": "건기식",
+  "code": "S",
+  "note": "회복의 과학",
+  "items": [
+   {
+    "c": "S1",
+    "n": "미네랄 — 발한 직후 재충전",
+    "cnt": 7,
+    "brands": [
+     "Ancient + Brave",
+     "LMNT",
+     "Moon Juice"
+    ],
+    "ex": "Magnesi-Om (30 servings) · Neuro Magnesi-Om (30 serving · Zero-Sugar Electrolytes (30 "
+   },
+   {
+    "c": "S2",
+    "n": "수면 — 세션 후",
+    "cnt": 3,
+    "brands": [
+     "Form Nutrition",
+     "Innermost",
+     "Sun Potion"
+    ],
+    "ex": "ZZZZs — Natural Sleep Supple · The Reset Capsules (60캡슐 / 3 · Ashwagandha (Wildcrafted) 11"
+   },
+   {
+    "c": "S3",
+    "n": "회복 — 단백질·콜라겐·버섯",
+    "cnt": 4,
+    "brands": [
+     "Ancient + Brave",
+     "DIRTEA",
+     "Form Nutrition"
+    ],
+    "ex": "Edge — Focus Capsules · True Collagen (약 40servings) · Performance Protein (520g / "
+   }
+  ],
+  "cnt": 14
+ },
+ {
+  "g": "생활용품",
+  "code": "L",
+  "note": "집으로 가져가는 333˚",
+  "items": [
+   {
+    "c": "L1",
+    "n": "린넨 — 가운·타월·매트·시트",
+    "cnt": 12,
+    "brands": [
+     "BAINA",
+     "Bathing Culture",
+     "Cold Picnic",
+     "Dusen Dusen",
+     "Jokipiin Pellava",
+     "Lapuan Kankurit",
+     "SASAWASHI",
+     "Växbo Lin",
+     "deiji studios"
+    ],
+    "ex": "SULIS Bath Robe · SORN Bath Towel · Bathhouse Check Organic Robe"
+   },
+   {
+    "c": "L2",
+    "n": "목욕 도구 — 브러시·스크럽",
+    "cnt": 4,
+    "brands": [
+     "Andrée Jardin",
+     "Bathing Culture",
+     "Iris Hantverk"
+    ],
+    "ex": "Total Body Brush · Bath Brush Puck · Bath Brush With Handle (oak "
+   },
+   {
+    "c": "L3",
+    "n": "사우나 기물 — 버킷·모자·스톤",
+    "cnt": 8,
+    "brands": [
+     "Emendo",
+     "Harvia",
+     "Hukka Design",
+     "Jokipiin Pellava",
+     "KOLO Sauna",
+     "Rento"
+    ],
+    "ex": "Aluminum Bamboo Sauna Bucket · Sauna Scent Birch · Tupas Sauna Hat (linen terry"
+   },
+   {
+    "c": "L4",
+    "n": "오브제 — 컵·유리·오래 쓰는 것",
+    "cnt": 4,
+    "brands": [
+     "HASAMI PORCELAIN",
+     "Kaikado (開化堂)",
+     "La Soufflerie",
+     "fferrone design"
+    ],
+    "ex": "Copper Tea Caddy 100g · Verre Palais Miel (23cl tumb · Dearborn Water Glass (set of"
+   },
+   {
+    "c": "L5",
+    "n": "향 — 인센스·캔들·룸스프레이",
+    "cnt": 5,
+    "brands": [
+     "APOTHEKE FRAGRANCE (APFR)",
+     "BLACKBIRD",
+     "Perfumer H",
+     "Skandinavisk",
+     "VERDEN"
+    ],
+    "ex": "Hoth™ Incense (tin, 20 cones · Incense Sticks / Blue Spruce · SKOG Scented Candle 200g"
+   }
+  ],
+  "cnt": 33
+ }
+]

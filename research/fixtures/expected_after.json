@@ -1,0 +1,48 @@
+{
+ "accepted": [
+  "KOLO Sauna — Bucket and Ladle Set",
+  "Kaurilan Sauna — Sauna Soap Bar"
+ ],
+ "rejected": [
+  {
+   "item": "Bathing  Culture — Mind and Body Bar!",
+   "reason": "중복 (norm 후 p002 와 동일)"
+  },
+  {
+   "item": "Bathing Culture — Gift Box: Scented Candle + Soap",
+   "reason": "브랜드 3종 초과"
+  }
+ ],
+ "master_after_len": 7,
+ "ids_unchanged": {
+  "p001": "fit",
+  "p002": "",
+  "p003": "hold",
+  "p004": "",
+  "p005": ""
+ },
+ "new_ids": {
+  "p006": "KOLO Sauna",
+  "p007": "Kaurilan Sauna"
+ },
+ "confidence": {
+  "p006": "높음",
+  "p007": "낮음"
+ },
+ "subCode": {
+  "p006": "L3",
+  "p007": "B1"
+ },
+ "addedOn": {
+  "p001": "2026-08-28",
+  "p006": "<오늘>",
+  "p007": "<오늘>"
+ },
+ "ig": {
+  "p006": {
+   "handle": "미확인",
+   "url": "",
+   "followers": "미확인"
+  }
+ }
+}
