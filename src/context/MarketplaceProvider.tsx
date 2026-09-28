@@ -112,6 +112,34 @@ function reducer(state: State, action: Action): State {
 }
 
 /* ---------------------------------------------------------------------- */
+/* paginated fetch                                                        */
+/* ---------------------------------------------------------------------- */
+
+/* PostgREST silently caps an unranged `select('*')` at its configured
+   max-rows (1000 on this project) — past that, rows are dropped with no
+   error, so tables that can grow past 1000 (brand_images in particular,
+   since every brand contributes up to 4 rows) must be paged through
+   explicitly instead of trusting a single select to return everything. */
+const FETCH_PAGE_SIZE = 1000
+
+async function fetchAllRows<T = Record<string, unknown>>(table: string) {
+  const rows: T[] = []
+  let from = 0
+  while (true) {
+    const res = await supabase
+      .from(table)
+      .select('*')
+      .range(from, from + FETCH_PAGE_SIZE - 1)
+    if (res.error) return { data: rows, error: res.error }
+    const page = (res.data as T[] | null) || []
+    rows.push(...page)
+    if (page.length < FETCH_PAGE_SIZE) break
+    from += FETCH_PAGE_SIZE
+  }
+  return { data: rows, error: null }
+}
+
+/* ---------------------------------------------------------------------- */
 /* entry row <-> BrandEntry                                               */
 /* ---------------------------------------------------------------------- */
 
@@ -445,9 +473,16 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
 
     function loadAll() {
       Promise.all([
-        supabase.from('brand_entries').select('*'),
-        supabase.from('brands_view').select('*'),
-        supabase.from('brand_images').select('*'),
+        fetchAllRows<{
+          id: string
+          status: string | null
+          delete_reason: string | null
+          comments: Comment[] | null
+          image_cleared: boolean | null
+          custom_image: string | null
+        }>('brand_entries'),
+        fetchAllRows<BrandRow>('brands_view'),
+        fetchAllRows<{ id: string; updated_at: string }>('brand_images'),
         supabase
           .from('brand_weekly_hot')
           .select('*')
