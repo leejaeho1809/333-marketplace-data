@@ -30,7 +30,14 @@ const initialState: State = {
   hotWeekRange: null,
 }
 
-const EMPTY_ENTRY: BrandEntry = { status: null, deleteReason: null, comments: [], imageCleared: false, customImage: null }
+const EMPTY_ENTRY: BrandEntry = {
+  status: null,
+  deleteReason: null,
+  comments: [],
+  imageCleared: false,
+  customImage: null,
+  contactStatus: null,
+}
 
 type Action =
   | {
@@ -149,6 +156,7 @@ function entryRowToJs(row: {
   comments: Comment[] | null
   image_cleared: boolean | null
   custom_image: string | null
+  contact_status?: string | null
 }): BrandEntry {
   return {
     status: (row.status as BrandEntry['status']) || null,
@@ -156,6 +164,7 @@ function entryRowToJs(row: {
     comments: row.comments || [],
     imageCleared: !!row.image_cleared,
     customImage: row.custom_image || null,
+    contactStatus: (row.contact_status as BrandEntry['contactStatus']) || null,
   }
 }
 
@@ -167,6 +176,7 @@ function entryJsToRow(id: string, e: BrandEntry) {
     comments: e.comments || [],
     image_cleared: !!e.imageCleared,
     custom_image: e.customImage || null,
+    contact_status: e.contactStatus || null,
   }
 }
 
@@ -212,6 +222,7 @@ interface MarketplaceContextValue {
   deleteComment: (id: string, ts: number) => void
   setStatus: (id: string, status: 'saved' | 'consider' | 'deleted') => void
   setDeleteReason: (id: string, reason: string) => void
+  setContactStatus: (id: string, status: 'needed' | 'in_progress') => void
 
   getImgSrc: (b: Brand, entry: BrandEntry) => string | null
   hasReliableImage: (b: Brand, entry: BrandEntry) => boolean
@@ -302,6 +313,12 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
   function setDeleteReason(id: string, reason: string) {
     const entry = getEntry(id)
     writeEntry(id, { ...entry, deleteReason: entry.deleteReason === reason ? null : reason })
+  }
+
+  function setContactStatus(id: string, status: 'needed' | 'in_progress') {
+    const entry = getEntry(id)
+    if (navigator.vibrate) navigator.vibrate(15)
+    writeEntry(id, { ...entry, contactStatus: entry.contactStatus === status ? null : status })
   }
 
   /* ---- images ---- */
@@ -480,6 +497,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
           comments: Comment[] | null
           image_cleared: boolean | null
           custom_image: string | null
+          contact_status: string | null
         }>('brand_entries'),
         fetchAllRows<BrandRow>('brands_view'),
         fetchAllRows<{ id: string; updated_at: string }>('brand_images'),
@@ -641,6 +659,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
     deleteComment,
     setStatus,
     setDeleteReason,
+    setContactStatus,
     getImgSrc,
     hasReliableImage,
     getBsImg,

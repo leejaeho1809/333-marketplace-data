@@ -12,13 +12,16 @@ export function BrandCard({
   view,
   footer,
   onClick,
-  rankBadge,
+  cornerBadge,
 }: {
   brand: Brand
   view: 'grid' | 'list'
   footer: ReactNode
   onClick: () => void
-  rankBadge?: ReactNode
+  /* Overlaid at the top-left of the image — the hot-brand rank circle in
+     ADD BRAND, the contact-status chip in DISCOVER. Caller owns the visuals
+     entirely; this just reserves the slot. */
+  cornerBadge?: ReactNode
 }) {
   const { getEntry, getImgSrc, setHeroImage, clearImage } = useMarketplace()
   const [dragOver, setDragOver] = useState(false)
@@ -75,7 +78,7 @@ export function BrandCard({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        {rankBadge}
+        {cornerBadge}
         <div className={'absolute inset-0 flex items-end ' + (isList ? 'p-2.5' : 'p-5')}>
           {!isList && (
             <div className="absolute top-4 left-5 text-[10px] tracking-[0.04em] text-white/55 font-mono">

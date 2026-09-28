@@ -6,6 +6,7 @@
  * object per brand. */
 
 export type BrandStatus = 'saved' | 'consider' | 'deleted' | null
+export type ContactStatus = 'needed' | 'in_progress' | null
 
 export interface BestSeller {
   name: string
@@ -85,6 +86,11 @@ export interface BrandEntry {
      Storage-backed images existed) — kept on the type and round-tripped
      as-is so saving an entry never silently wipes it on an old row. */
   customImage?: string | null
+  /* Outreach status, independent of the SAVE/CONSIDER/DELETE decision above —
+     a brand can be "컨택 필요"/"컨택중" regardless of where it sits in that
+     workflow. Mutually exclusive with itself only (picking one clears the
+     other), not with `status`. */
+  contactStatus: ContactStatus
 }
 
 export interface HotBrandRow {

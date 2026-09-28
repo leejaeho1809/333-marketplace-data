@@ -73,6 +73,7 @@ export function DetailModal({
     deleteComment,
     setStatus,
     setDeleteReason,
+    setContactStatus,
     getImgSrc,
     getBsImg,
     setHeroImage,
@@ -229,7 +230,31 @@ export function DetailModal({
         </div>
 
         <div className="px-9 pt-8 pb-10">
-          <div className="text-[26px] font-semibold">{brand.name}</div>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="text-[26px] font-semibold">{brand.name}</div>
+            <div className="flex shrink-0 gap-1">
+              <button
+                type="button"
+                onClick={() => setContactStatus(brandId, 'needed')}
+                className={
+                  'border px-3.5 py-2 text-[11.5px] font-medium ' +
+                  (entry.contactStatus === 'needed' ? 'border-ink bg-ink text-bg' : 'border-line text-stone')
+                }
+              >
+                컨택 필요
+              </button>
+              <button
+                type="button"
+                onClick={() => setContactStatus(brandId, 'in_progress')}
+                className={
+                  'border px-3.5 py-2 text-[11.5px] font-medium ' +
+                  (entry.contactStatus === 'in_progress' ? 'border-blue bg-blue text-white' : 'border-line text-stone')
+                }
+              >
+                컨택중
+              </button>
+            </div>
+          </div>
           <div className="mt-1.5 text-[12.5px] text-stone font-mono">
             {brand.country} · {brand.category.join(' · ')}
           </div>

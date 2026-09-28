@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useMarketplace } from '@/context/MarketplaceProvider'
 import { BrandCard } from '@/components/marketplace/BrandCard'
-import type { Brand, BrandStatus, TabId, ViewMode } from '@/types/marketplace'
+import type { Brand, BrandStatus, ContactStatus, TabId, ViewMode } from '@/types/marketplace'
 
 function statusLabel(st: BrandStatus) {
   if (st === 'saved') return 'SAVED'
@@ -20,6 +20,21 @@ function StatusBadge({ status }: { status: BrandStatus }) {
         : 'border-stone-light text-stone-light line-through'
   return (
     <div className={'border px-2 py-1 text-[10.5px] tracking-[0.03em] ' + classes}>{statusLabel(status)}</div>
+  )
+}
+
+function ContactBadge({ status }: { status: ContactStatus }) {
+  if (!status) return null
+  const isNeeded = status === 'needed'
+  return (
+    <div
+      className={
+        'absolute top-2.5 left-2.5 z-5 border-2 border-bg px-2.5 py-1 text-[10px] tracking-[0.03em] uppercase font-mono text-white ' +
+        (isNeeded ? 'bg-ink' : 'bg-blue')
+      }
+    >
+      {isNeeded ? '컨택 필요' : '컨택중'}
+    </div>
   )
 }
 
@@ -86,6 +101,7 @@ export function DiscoverDeck({
             view={view}
             footer={<StatusBadge status={getEntry(b.id).status} />}
             onClick={() => onOpenBrand(b.id)}
+            cornerBadge={tab === 'discover' ? <ContactBadge status={getEntry(b.id).contactStatus} /> : undefined}
           />
         ))}
       </div>

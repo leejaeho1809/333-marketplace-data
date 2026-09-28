@@ -111,7 +111,7 @@ Same region split, same subagent-count discipline (reuse the research subagents'
 
 ```bash
 URL="https://agwcymyrwaeykvfsivzt.supabase.co/storage/v1/object/brand-images"
-KEY="<fetch fresh via mcp__supabase-personal__get_publishable_keys — anon/legacy key, do not hardcode a stale one>"
+KEY="<fetch fresh via mcp__plugin_supabase_supabase__get_publishable_keys (project_id agwcymyrwaeykvfsivzt) — anon/legacy key, do not hardcode a stale one>"
 curl -s -o /tmp/resp.json -w "%{http_code}" -X POST "$URL/hero:<id>" \
   -H "Authorization: Bearer $KEY" -H "apikey: $KEY" \
   -H "Content-Type: image/jpeg" -H "x-upsert: true" \

@@ -99,7 +99,7 @@ export function CandidatesTab({
                   view="grid"
                   footer={<CandidateActions brand={b} />}
                   onClick={() => onOpenBrand(b.id)}
-                  rankBadge={
+                  cornerBadge={
                     <div
                       className="hot-rank-badge absolute top-2.5 left-2.5 z-5 flex h-[38px] w-[38px] cursor-default items-center justify-center rounded-full border-2 border-bg bg-blue text-lg font-bold text-white shadow-[0_1px_4px_rgba(5,7,7,0.35)] font-mono"
                       data-tooltip={`총 언급 ${h.mention_count}회`}
